@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Side By Side View For Grading</h1>
+	<div class="panel callout radius">
+		<section class="side-by-side">
+			<div class="float-l iframe-grade-container">
+				<h2>Source Text</h2>
+				<iframe class="" src="/side-by-side/source-text/{{sourceTextID }}" name="hw_iframe"></iframe>
+			</div>
+			<div style="margin-left:50px" class="float-l iframe-grade-container">
+				<h2>Target Text</h2>
+				<iframe class="" src="/side-by-side/target-text/{{targetTextID}}" name="hw_iframe"></iframe>
+			</div>
+			<div class="errors-container">
+				<form action="/grade/exam/" method="post">{% csrf_token %}
+					<label for="errors">Error List</label>
+					<select id="errors" name="errors">
+						<option value="none">Select Error</option>
+					{% for error in errors %}
+						<option value="{{ error.name }}">{{ error.name }}</option>
+					{% endfor %}
+					</select>
+					<label for="severity">Error Severity</label>
+					<select id="severity" name="severity">
+						<option value="none">Error Severity</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+					</select>
+					<label for="graderComments">Error Comments</label>
+					<textarea id="graderComments" name="graderComments" placeholder="this will be bigger"></textarea>
+					<input class="button radius" type="submit" value="Submit Error" name="submitError">
+					<input class="button radius" type="reset" value="Reset Error" name="reset">
+					<input style="margin-top:200px" class="button alert radius" type="submit" value="Submit Exam" name="submitExam">
+				</form>
+			</div>			
+		</section>
+	</div>
+{% endblock %}		

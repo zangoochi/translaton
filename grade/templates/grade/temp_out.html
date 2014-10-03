@@ -1,0 +1,17 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This is a temporary page displaying output from grading exam form and submitted errors</h1>
+	<div class="panel callout radius">
+		<section class="side-by-side">
+
+			<p>Error entered by grader = {{ examErrors.errors }}</p>
+			<p>Severity of the error = {{ examErrors.severity }}</p>
+			<p>Grader Error Comments = {{ examErrors.graderComments }}</p>
+			<p>These can now be stored temp until target exam has been completely graded</p>
+
+		</section>
+
+{% endblock %}

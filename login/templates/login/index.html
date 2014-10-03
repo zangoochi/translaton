@@ -1,0 +1,28 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block body_block %}
+<div id="login" style="width:300px; margin: 100px auto 0 auto;">
+<form method="POST" action="/login/authenticate/"> {% csrf_token %}
+<fieldset>
+<legend>Login</legend>
+{% csrf_token %}
+{% if next %}
+<input type="hidden" name="next" value="{{ next }}" />
+{% endif %}
+<div class="row">
+	<label class="large-1 columns" for="username">Username</label>
+	<input type="text" id="username" name="username"  placeholder="Username">
+</div>
+<div class="row">
+	<label class="large-1 columns" for="password">Password</label>
+	<input type="password" name="password" id="password" placeholder="Password">
+	</div>
+<div class="row" style="text-align: center;">
+	<button type="submit" class="small button" value="Submit">Login</button>
+	<button type="button" class="small button" onclick="window.location.href='/login/create-user' ">Create User</button>
+</div>
+
+</fieldset>
+</form>
+</div>
+{% endblock %}

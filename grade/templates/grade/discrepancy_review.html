@@ -1,0 +1,34 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+
+	<h1>Side By Side View For discrepancy review side by side</h1>
+	<div class="panel callout radius">
+		<section class="side-by-side">
+
+			<form action="/grade/discrepancy-review/{{ discrepancyID }}/" method="POST">
+			{% csrf_token %}
+		    <input type="hidden" id="verifiedText" name="verifiedText"/>
+
+			<div class="float-l div_side_by_side">
+				{{ originalText}}
+			</div>
+			
+			<div class="float-r div_side_by_side" onClick="this.contentEditable='true';" id="modifyDiv">
+				{{ modifiedText|safe }}
+			</div>
+		
+			<button onClick="submitVerify();">Sumbit</button>
+		
+		</form>
+		</section>
+	</div>
+	<br/>
+	 <input type="button" id="pdf" name="pdf" value="View PDF Scan" onclick="return popup('/static/pdf/{{ discrepancy.text.pdfURI }}', 'PDF Scan')"/>
+	<br/>
+
+<script src="/static/js/verify.js"></script>
+
+{% endblock %}

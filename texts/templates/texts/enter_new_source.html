@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+    <h1>Enter New Source</h1>
+    <div class="row panel callout radius">
+        <div class="large-12 columns new-source-entry">
+                <form action="/texts/enter-new-source/" method="post" id="examForm">
+
+		{% csrf_token %}
+
+                    <div class="row">
+                        <div class="large-2 columns">
+                            <label for="year">Year</label>
+                            {{form.year}}
+                            
+                            {% for error in form.year.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="large-2 columns">
+                            <label for="sourceLanguage">Source Language</label>
+                            {{form.sourceLanguage}}
+
+                            {% for error in form.sourceLanguage.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="large-2 columns">
+                            <label for="targetLanguage">Target Language</label>
+                            {{ form.targetLanguage}}
+
+                            {% for error in form.targetLanguage.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="large-2 columns">
+                            <label for="setNumber">Set Number</label>
+				{{form.setNumber}}
+
+                            {% for error in form.setNumber.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="large-2 columns">
+                            <label for="passageLetter">Passage Letter</label>
+                            {{form.passageLetter}}
+
+                            {% for error in form.passageLetter.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="large-2 columns">
+                            <label for="versionNumber">Version Number</label>
+                            {{form.versionNumber}}
+
+                            {% for error in form.versionNumber.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}
+                        </div>                                              
+                    </div>
+                    <div class="row"> 
+                        <div class="large-12 columns">
+                            <label for="sourcePassage">Source Passage Input</label>
+                            <textarea style="height:650px" id="sourcePassage" name="sourcePassage"></textarea>  
+                            {% for error in form.sourcePassage.errors %}
+                                <small class="error">{{  error  }}</small>
+                            {% endfor %}    
+                        </div>
+                    </div>
+
+                    <input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource" onclick="document.getElementById('examForm').submit();">
+                    <input class="button radius" type="reset"  name="reset">
+                </form>
+        </div>
+    </div>
+{% endblock %}

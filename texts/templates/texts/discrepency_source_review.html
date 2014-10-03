@@ -1,0 +1,152 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This Is Side By Side View For Source Discrepencies</h1>
+	<div class="row">
+		<div class="large-6 columns">
+			<div class="row">
+				<div class="large-11 columns large-centered columns panel callout radius">
+					<h3>Your Last Input</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="large-11 large-centered columns panel callout radius">
+					<div class="row">
+                        <div class="large-4 columns">
+                            <label>Year</label>
+                            <p>{{ sourceDiscrepency.originalSource.year }}</p>
+                        </div>	
+	                    <div class="large-4 columns">
+	                        <label>Source Language</label>
+	                        <p>{{ sourceDiscrepency.originalSource.sourceLanguage.displayName }}</p>
+	                    </div>
+	                    <div class="large-4 columns">
+	                        <label>Target Language</label>
+	                        <p>{{ sourceDiscrepency.originalSource.targetLanguage.displayName }}</p>
+	                    </div>	                    
+	                </div>
+	                <div class="row">
+                        <div class="large-4 columns">
+                            <label>Set Number</label>
+                            <p>{{ sourceDiscrepency.originalSource.setNumber }}</p>
+                        </div>	
+	                    <div class="large-4 columns">
+	                        <label>Passage Letter</label>
+	                        <p>{{ sourceDiscrepency.originalSource.passageLetter }}</p>
+	                    </div>
+	                    <div class="large-4 columns">
+	                        <label>Version Number</label>
+	                        <p>{{ sourceDiscrepency.originalSource.versionNumber }}</p>
+	                    </div>
+	                </div>
+                    <div class="row"> 
+                        <div class="large-12 columns" style="margin-top:15px">
+                            <label for="sourcePassage">Source Passage Input</label>
+                            <p style="min-height:500px;background-color:white;border:1px solid lightgrey;padding:5px;margin-bottom:88px">{{ sourceDiscrepency.originalSource.text }}</p>      
+                        </div>
+                    </div>     	                           				
+				</div>				
+			</div>
+		</div>		
+		<div class="large-6 columns" >
+			<div class="row">
+				<div class="large-11 columns large-centered columns panel callout radius">
+					<h3>Has Been Changed To</h3>
+				</div>
+			</div>			
+			<div class="row">
+				<div class="large-11 large-centered columns panel callout radius">
+					<form action="/texts/review-source-descrepency/{{ sourceDiscrepency.originalSource.id }}/" method="post">{% csrf_token %}
+						<div class="row">
+	                        <div class="large-4 columns">
+	                            <label for="year">Year</label>
+	                            <select id="year" name="year">
+	                                <option value="{{ sourceDiscrepency.year }}">{{ sourceDiscrepency.year }}</option>
+	                                <option value="2012">2012</option>
+	                                <option value="2013">2013</option>
+	                                <option value="2014">2014</option>
+	                                <option value="2015">2015</option>
+	                                <option value="2016">2016</option>
+	                                <option value="2017">2017</option>
+	                                <option value="2018">2018</option>
+	                                <option value="2019">2019</option>
+	                                <option value="2020">2020</option>
+	                            </select>
+	                        </div>						
+		                    <div class="large-4 columns">
+		                        <label for="sourceLanguage">Source Language</label>
+		                        <select id="sourceLanguage" name="sourceLanguage">
+		                            <option value="{{ sourceDiscrepency.sourceLanguage }}">{{ sourceDiscrepency.sourceLanguage.displayName }}</option>
+									{% for lang in langs %}
+										{% if sourceDiscrepency.sourceLanguage.displayName != lang.displayName %}
+										<option value="{{ lang.language }}">{{ lang.displayName }}</option>
+										{% endif %}
+									{% endfor %}
+		                        </select>
+		                    </div>
+	                        <div class="large-4 columns">
+	                            <label for="targetLanguage">Target Language</label>
+	                            <select id="targetLanguage" name="targetLanguage">
+	                                <option value="{{ sourceDiscrepency.targetLanguage }}">{{ sourceDiscrepency.targetLanguage.displayName }}</option>
+									{% for lang in langs %}
+										{% if sourceDiscrepency.targetLanguage.displayName != lang.displayName %}
+										<option value="{{ lang.language }}">{{ lang.displayName }}</option>
+										{% endif %}
+									{% endfor %}
+	                            </select>
+	                        </div>	                    
+	                	</div>
+	                	<div class="row">
+	                        <div class="large-4 columns">
+	                            <label for="setNumber">Set Number</label>
+	                            <input id="setNumber" name="setNumber" type="text" value="{{ sourceDiscrepency.setNumber }}"> 
+	                        </div>
+	                        <div class="large-4 columns">
+	                            <label for="passageLetter">Passage Letter</label>
+	                            <select id="passageLetter" name="passageLetter">
+	                                <option value="{{ sourceDiscrepency.passageLetter }}">{{ sourceDiscrepency.passageLetter }}</option>
+									{% if sourceDiscrepency.passageLetter != "A" %}
+										<option value="A">A</option>
+									{% endif %}
+									{% if sourceDiscrepency.passageLetter != "B" %}
+										<option value="B">B</option>
+									{% endif %}
+									{% if sourceDiscrepency.passageLetter != "C" %}
+										<option value="C">C</option>
+									{% endif %}
+	                            </select>
+	                        </div>
+	                        <div class="large-4 columns">
+	                            <label for="versionNumber">Version Number</label>
+	                            <input id="versionNumber" name="versionNumber" type="text" value="{{ sourceDiscrepency.versionNumber }}">
+	                        </div>                                                              		
+	                	</div>
+	                    <div class="row"> 
+	                        <div class="large-12 columns">
+	                            <label for="sourcePassageDiv">Source Passage Input</label>
+								<textarea style="height:500px;font-size:0.975em" id="sourcePassage" name="sourcePassage">{{ sourceDiscrepency.text }}</textarea> 
+	                        </div>
+	                    </div>
+	                    <div class="row">
+	                    	<div class="small-12 columns">
+			                    <input class="button radius" style="margin-right:137px" type="submit" value="Submit Source" name="submitSource" onclick="return onDiscrepSubmit();">
+			                    <input class="button radius" type="reset"  name="reset">
+		                    </div>
+	                    </div>
+	                </form>                	
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		function onDiscrepSubmit()
+		{
+			document.getElementById('sourcePassage').value = document.getElementById('sourcePassageDiv').innerText;
+		}
+	
+	</script>
+{% endblock %}

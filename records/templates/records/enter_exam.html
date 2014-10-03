@@ -1,0 +1,243 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+
+{% block body_block %}
+<body onload="filterSelectBox()">
+<h1>New Exam Record</h1>
+
+<div class="row panel callout radius">
+    <div class="row">
+        <div class="small-6 columns">
+            <form action="/records/enter-exam/" method="post" id="examForm">
+
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="year">Year</label>
+                        {{ form.year }}
+                        {% for error in form.year.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="examNumber">Exam Number</label>
+                        {{form.examNumber }}
+                        {% for error in form.examNumber.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="sourceLanguage">Source Language</label>
+                        {{form.sourceLanguage}}
+                        {% for error in form.sourceLanguage.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="targetLanguage">Target Language</label>
+                        {{form.targetLanguage}}
+                        {% for error in form.targetLanguage.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="secondPassage">Second Passage</label>
+                        {{form.secondPassage}}
+                        {% for error in form.secondPassage.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-6 small-centered columns">
+                        <label for="sourceText1">Source Text 1</label>
+                        {{form.sourceText1}}
+                        {% for error in form.sourceText1.errors %}
+                        <small class="error">{{  error  }}</small>
+                        {% endfor %}
+                 </div>
+             </div>
+
+
+             <div class="row">
+                <div class="small-6 small-centered columns">
+                    <label for="sourceText2">Source Text 2</label>
+                    {{form.sourceText2}}
+                    {% for error in form.sourceText2.errors %}
+                        <small class="error">{{  error  }}</small>
+                    {% endfor %}
+             </div>
+         </div>
+
+         <div class="row">
+            <div class="small-6 small-centered columns">
+                <label for="grader1">Grader #1</label>
+                <select id="grader1" name="grader1">
+                    
+                    <!-- First loop goes through all graders. Then matches the graders with their language pairs. This allows us to 
+                          grab the graders username based off of the languages that they know. The next step is to get the actual language                             name from the grader language pair list  -->
+                    {% for grader in graders %}
+						{% for l in language %}
+							{% if l.user_id == grader.id %}
+								{% for lang in languages %}
+									{% if l.language_id == lang.id %}
+                    					<option data-language="{{ lang }}", data-graderId="{{grader.id}}"> {{ grader.username }}</option>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+                    {% endfor %}
+                </select>
+                {% for error in form.grader1.errors %}
+                        <small class="error">{{  error  }}</small>
+                {% endfor %}
+            </div>
+        </div>
+
+         <div class="row">
+            <div class="small-6 small-centered columns">
+                <label for="grader2">Grader #2</label>
+                <select id="grader2" name="grader2">
+                    {% for grader in graders %}
+						{% for l in language %}
+							{% if l.user_id == grader.id %}
+								{% for lang in languages %}
+									{% if l.language_id == lang.id %}
+                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+                    {% endfor %}
+                </select>
+                {% for error in form.grader2.errors %}
+                        <small class="error">{{  error  }}</small>
+                {% endfor %}
+            </div>
+        </div>
+
+	Toggle grader 3: <input id="grader3cb" type="checkbox" onClick="validateGrader3()" /> </br>
+	Toggle grader 4: <input id="grader4cb" type="checkbox" onClick="validateGrader4()" />
+
+	<div style="visibility:hidden" id="grader3Div">
+	         <div class="row">
+	            <div class="small-6 small-centered columns">
+	                <label for="grader3">Grader #3</label>
+	                <select id="grader3" name="grader3">
+	                    {% for grader in graders %}
+							{% for l in language %}
+								{% if l.user_id == grader.id %}
+									{% for lang in languages %}
+										{% if l.language_id == lang.id %}
+	                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+							{% endfor %}
+	                    {% endfor %}
+	                </select>
+	                {% for error in form.grader3.errors %}
+	                        <small class="error">{{  error  }}</small>
+	                {% endfor %}
+	            </div>
+	        </div>
+	</div>
+
+	<div style="visibility:hidden" id="grader4Div">
+	         <div class="row">
+	            <div class="small-6 small-centered columns">
+	                <label for="grader4">Grader #4</label>
+	                <select id="grader4" name="grader4">
+	                    {% for grader in graders %}
+							{% for l in language %}
+								{% if l.user_id == grader.id %}
+									{% for lang in languages %}
+										{% if l.language_id == lang.id %}
+	                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+							{% endfor %}
+	                    {% endfor %}
+	                </select>
+	                {% for error in form.grader4.errors %}
+	                        <small class="error">{{  error  }}</small>
+	                {% endfor %}
+	            </div>
+	        </div>
+	</div>    
+
+	<script type="text/javascript">
+		var grader3Div = document.getElementById('grader3Div');
+		var grader4Div = document.getElementById('grader4Div');
+
+        
+        function validateGrader3(){
+            var g3cb = document.getElementById('grader3cb');
+            var g3 = document.getElementById('grader3');
+            if (g3cb.checked){
+                grader3Div.style.visibility = "visible";
+            }else{
+                grader3Div.style.visibility = "hidden";
+                g3.value = null;
+            }
+        };
+        
+        function validateGrader4(){
+            var g4cb = document.getElementById('grader4cb');
+            var g4 = document.getElementById('grader4');
+            if (g4cb.checked){
+                grader4Div.style.visibility = "visible";
+            }else{
+                grader4Div.style.visibility = "hidden";
+                g4.value = null;
+            }
+        };
+	</script>
+
+
+
+    </form>
+</div>
+
+<div class="small-6 columns">
+    <div class="row">
+        <div id="dropzone">
+            <form id="my-awesome-dropzone" action="/records/enter-exam/upload-pdf/" class="dropzone">
+                {% csrf_token %}
+                <input type="hidden" id="examNumberPDF" name="examNumberPDF"/>
+            </form>
+        </div>
+    </div>
+     <div class="row">
+                <div class="small-6 columns">
+                    <input class="button alert" type="reset" value="Reset Form" name="reset">
+                </div>
+
+                <div class="small-6 columns">
+                    <input class="button" type="submit" value="Enter New Exam" name="newExam" id="uploadButton" onclick="document.getElementById('examForm').submit();">
+                </div>
+                   
+             
+        </div>
+</div>
+
+<script type="text/javascript" src="/static/js/newExam.js"> 
+
+{% endblock %}

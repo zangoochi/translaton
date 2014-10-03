@@ -1,0 +1,43 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+{% block body_block %}
+
+<br />
+
+<h3>Graded Exams</h3>
+
+<table align="center">
+	<thead>
+		<tr>
+			<td>
+				Exam #
+			</td>
+			<td>
+				Passage Letter
+			</td>
+			<td>
+				Source Language
+			</td>
+			<td>
+				Target Language
+			</td>
+		</tr>
+	</thead>
+	{% for exam in gradedExams %}
+		<tr>
+			<td> Exam# {{exam.examNumber}} </td>
+			<td><a href="/grade/exam/{{ exam.examNumber }}/A/">Passage A </a></td>
+			<td> {{exam.sourceText1.sourceLanguage.displayName}} </td>
+			<td> {{exam.sourceText1.targetLanguage.displayName}} </td>
+		</tr>
+		<tr>
+			<td> Exam# {{exam.examNumber}} </td>
+			<td><a href="/grade/exam/{{ exam.examNumber }}/{{ exam.secondPassage }}/">Passage {{  exam.secondPassage }} </a></td>
+			<td> {{exam.sourceText2.sourceLanguage.displayName}} </td>
+			<td> {{exam.sourceText2.targetLanguage.displayName}} </td>
+		</tr>
+	{%  endfor  %}
+</table>
+
+{% endblock %}

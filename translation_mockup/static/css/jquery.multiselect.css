@@ -1,0 +1,92 @@
+.ui-multiselect {   
+  -webkit-appearance: none !important;
+  background: #fafafa url("data:image/svg+xml;base64, PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iM3B4IiB2aWV3Qm94PSIwIDAgNiAzIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA2IDMiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwb2x5Z29uIHBvaW50cz0iNS45OTIsMCAyLjk5MiwzIC0wLjAwOCwwICIvPjwvc3ZnPg==") no-repeat;
+  background-position-x: 97%;
+  background-position-y: center;
+  border: 1px solid #cccccc;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  -webkit-border-radius: 0;
+  border-radius: 0; }
+  select.radius {
+    -webkit-border-radius: 3px;
+    border-radius: 3px; }
+  select:hover {
+    background: #f3f3f3 url("data:image/svg+xml;base64, PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iM3B4IiB2aWV3Qm94PSIwIDAgNiAzIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA2IDMiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwb2x5Z29uIHBvaW50cz0iNS45OTIsMCAyLjk5MiwzIC0wLjAwOCwwICIvPjwvc3ZnPg==") no-repeat;
+    background-position-x: 97%;
+    background-position-y: center;
+    border-color: #999999; }
+
+select::-ms-expand {
+  display: none; }
+
+@-moz-document url-prefix() {
+  select {
+    background: #fafafa; }
+
+  select:hover {
+    background: #f3f3f3; } }
+.ui-multiselect span.ui-icon {
+    float:right }
+.ui-multiselect-single .ui-multiselect-checkboxes input { position:absolute !important; top: auto !important; left:-9999px; }
+.ui-multiselect-single .ui-multiselect-checkboxes label { padding:5px !important;  }
+
+.ui-multiselect-header { margin:0px; padding:0px; }
+.ui-multiselect-header ul { font-size:0.9em; margin:0px; padding:0px; }
+.ui-multiselect-header ul li { margin-left: 5px; display:block; text-decoration:none;  }
+.ui-multiselect-header a { text-decoration:none }
+.ui-multiselect-header a:hover {  }
+.ui-multiselect-header span.ui-icon { float:left }
+.ui-multiselect-header li.ui-multiselect-close { float:right; text-align:right; padding-right:0 }
+
+.ui-multiselect-menu { 
+    display:none; 
+    border:1px solid #cccccc; 
+    position:absolute; 
+    z-index:10000; 
+    text-align: left; 
+    background-color: #fff;
+    padding-right:1px!important;
+    padding-left:1px!important;
+    margin-left:0px!important;
+    border-top:0;
+
+}
+.ui-multiselect-checkboxes { position:relative /* fixes bug in IE6/7 */; overflow-y:auto }
+.ui-multiselect-checkboxes label { cursor:default; display:block; border:1px solid transparent; padding:3px 1px }
+.ui-multiselect-checkboxes label input { position:relative; top:1px }
+.ui-multiselect-checkboxes li { clear:both; font-size:0.9em; padding-right:3px }
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label { text-align:center; font-weight:bold; border-bottom:1px solid }
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label a { display:block; padding:3px; margin:1px 0; text-decoration:none }
+
+/* remove label borders in IE6 because IE6 does not support transparency */
+* html .ui-multiselect-checkboxes label { border:none }
+
+
+/* FOUNDATION 4 FIX 
+ * @author: andreamariani
+ * www.andreamariani.net
+ * andream@fasys.it
+*/
+.ui-multiselect-menu ul li{
+    list-style:none;
+    
+}
+.ui-multiselect-checkboxes{
+    clear:both;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+}
+.ui-multiselect-checkboxes li{
+    margin:0!important;
+    padding:0!important;
+   
+}
+.ui-multiselect-checkboxes li:hover{
+    background-color:#e4e4e4;
+}
+.ui-multiselect-checkboxes input{
+    margin-right:7px;
+    margin-left: 2px;
+}

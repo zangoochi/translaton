@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Enter a Legacy Graded Exam</h1>
+	<h4>inputs will be drop down selects with options pulled from databse table</h4>
+	<div class="row panel callout radius">
+		<div class="large-12 columns">
+			<form action="/records/enter-exam/" method="post">{% csrf_token %}
+				<label>Exam Number:</label>
+				<input name="examNumber"/>
+				
+				<label>Second Passage:</label>
+				<input name="secondPassage"/>
+				
+				<label>Grader1</label>
+				<input name="grader1"/>
+				
+				<label>Grader2</label>
+				<input name="grader2"/>
+				
+				<label>Grader3</label>
+				<input name="grader3"/>
+				
+				<label>Grader4</label>
+				<input name="grader4"/>
+				
+				<label>Source Text 1 </label>
+				<input name="sourceText1"/>
+				
+				<Label>Source Text 2 </label>
+				<input name="sourceText2"/>
+
+				<Label>Language</label>
+				<input name="language"/>
+				
+				
+				<input type="submit"/>
+				
+			</form>
+		</div>
+	</div>
+{% endblock %}

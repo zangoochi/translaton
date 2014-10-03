@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Admin Page For Exam Records</h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns">
+			<h4>this can be a menue for entering and viewing database of source texts and target texts</h4>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="/records/enter-exam-record/" class="button radius small">New Exam</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Form to enter a new exam record to the database</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="/records/list-all-qued-records/" class="button radius small">List Needing Graded</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Lists all source texts currently needing graded</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="#" class="button radius small">Something Else</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Some other function with exam records</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+ {% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Side By Side View For Grading</h1>
+	<div class="panel callout radius">
+		<section class="side-by-side">
+			<div class="float-l iframe-container">
+				<h2>Source Text</h2>
+				<iframe class="" src="/side-by-side/source-text/" name="hw_iframe"></iframe>
+			</div>
+			<div class="float-r iframe-container">
+				<h2>Target Text</h2>
+				<iframe class="" src="/side-by-side/target-text/" name="hw_iframe"></iframe>
+			</div>
+		</section>
+	</div>
+{% endblock %}

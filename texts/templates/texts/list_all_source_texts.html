@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This will display a list of all source texts combinations</h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns new-source-entry">
+			<p>Here will be a list of all source text exam combinations.</p>
+			<ul>
+			
+			{% for text in sourceTexts %}
+				<li>Source Text{{forloop.counter}}: <a href="/side-by-side/source-text/{{text.id}}">{{text}}</a>
+			{% endfor %}
+			</ul>
+			
+		</div>
+	</div>
+{% endblock %}

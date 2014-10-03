@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Admin Page For Texts</h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns">
+			<h4>this can be a menu for entering and viewing database of source texts and target texts</h4>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="/texts/enter-new-source" class="button radius small">Enter New Source</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Form to enter a new source to database</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="/texts/list-of-all-source-texts" class="button radius small">List All Source</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Lists all source texts currently in database</h3>
+					<h4>then allow side by side viewing of selected source text combinations</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row panel radius">
+		<div class="large-12 columns">
+			<div class="row">
+				<div class="large-3 columns">
+					<a href="#" class="button radius small">Something Else</a>
+				</div>
+				<div class="large-9 columns">
+					<h3>Some other manipulation of the source texts</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

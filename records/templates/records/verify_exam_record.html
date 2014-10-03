@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Enter a Legacy Graded Exam</h1>
+	<h4>inputs will be drop down selects with options pulled from databse table</h4>
+	<div class="row panel callout radius">
+		<div class="large-12 columns">
+			<form action="/records/verify-exam-record/{{ exam.examNumber }}/{% if passageNumber == '1' %}1{% else %}2{% endif %}/" method="post">{% csrf_token %}
+				<div class="row">
+					<div class="large-2 columns">
+						<label for="examYear">Exam Year</label>
+						<input id="examYear" name="examYear" type="text" value="{{ exam.sourceText1.year }}" disabled/>
+					</div>
+					<div class="large-2 columns">
+						<label for="sourceLanguage">Source Language</label>
+						<input id="sourceLanguage" name="sourceLanguage" type="text" value="{{  exam.sourceText1.sourceLanguage.language  }}" disabled/>
+					</div>
+					<div class="large-2 columns">
+						<label for="targetLanguage">Target Language</label>
+						<input id="targetLanguage" name="targetLanguage" id="targetLanguage" type="text" value="{{  exam.sourceText1.targetLanguage.language  }}">
+					</div>
+					<div class="large-2 columns">
+						<label for="setNumber">Set Number</label>
+						<input id="setNumber" name="setNumber" type="text" value="{{  exam.sourceText1.setNumber  }}" disabled>	
+					</div>
+					<div class="large-2 columns">
+						<label for="passageLetter">Passage Letter</label>
+						<input id="passageLetter" name="passageLetter" type="text" value="{{  exam.sourceText1.passageLetter  }}" disabled>	
+					</div>
+					<div class="large-2 columns">
+						<label for="versionNumber">Version Number</label>
+						<input id="versionNumber" name="versionNumber" type="text" value="{{  exam.sourceText1.versionNumber  }}" disabled>
+					</div>												
+				</div>
+				<div class="row"> 
+					<div class="large-12 columns">
+						<label for="sourcePassage">Source Passage Input</label>
+						<textarea style="height:650px" id="text" name="text">{% if passageNumber == "1" %}{{ exam.targetText1.text }}{% else %}{{ exam.targetText2.text }}{% endif %}		
+						</textarea>		
+					</div>
+				</div>
+
+				<div class="row">
+						<div class="large-12 columns">
+							<label for="comments">Problem Comments</label>
+							<textarea style="height:250px" id="comments" name="comments"></textarea>
+						</div>	
+					</div>
+				
+				<input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource">
+				<input class="button radius" type="reset"  name="reset">
+
+				<input class="button radius" type="button" id="pdf" name="pdf" value="View PDF Scan" onclick="return popup('/static/pdf/example.pdf', 'PDF Scan')"/>
+			</form>
+		</div>
+	</div>
+{% endblock %}

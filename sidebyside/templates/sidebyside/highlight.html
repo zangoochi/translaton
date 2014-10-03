@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This is the source text for <span style="color:blue">{{name}}</span> </h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns new-source-entry">
+			<p>{{text}}</p>	
+		</div>
+		<a href="/texts/list-of-all-source-texts/">Back to all sources</a>
+	</div>
+{% endblock %}
+
+
+

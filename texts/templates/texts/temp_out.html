@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This is a temporary page displaying output from new source input form</h1>
+	<div class="panel callout radius">
+		<section class="side-by-side">
+			<p>Year: {{ post.year }}</p>			
+			<p>Year: {{ post.sourceLanguage }}</p>
+			<p>Year: {{ post.targetLanguage }}</p>
+			<p>Year: {{ post.setNumber }}</p>
+			<p>Year: {{ post.passageLetter }}</p>
+			<p>Year: {{ post.versionNumber }}</p>
+			<p>Year: {{ post.sourcePassage }}</p>
+			<p>-----------------------------------</p>
+			<p>Year: {{ discrep.year }}</p>			
+			<p>Year: {{ discrep.sourceLanguage }}</p>
+			<p>Year: {{ discrep.targetLanguage }}</p>
+			<p>Year: {{ discrep.setNumber }}</p>
+			<p>Year: {{ discrep.passageLetter }}</p>
+			<p>Year: {{ discrep.versionNumber }}</p>
+			<p>Year: {{ discrep.text }}</p>		
+		</section>
+	</div>
+{% endblock %}

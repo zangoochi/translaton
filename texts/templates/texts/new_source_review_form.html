@@ -1,0 +1,90 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>Final Review Of New Source Text</h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns new-source-entry">
+				<form action="/texts/review-source/{{ sourceToReview.id }}/" method="post">{% csrf_token %}
+					<div class="row">
+						<div class="large-2 columns">
+							<label for="year">Year</label>
+							<select id="year" name="year">
+								<option value="{{ sourceToReview.year }}">{{ sourceToReview.year }}</option>
+								<option value="2012">2012</option>
+								<option value="2013">2013</option>
+								<option value="2014">2014</option>
+								<option value="2015">2015</option>
+								<option value="2016">2016</option>
+								<option value="2017">2017</option>
+								<option value="2018">2018</option>
+								<option value="2019">2019</option>
+								<option value="2020">2020</option>
+							</select>
+						</div>
+						<div class="large-2 columns">
+							<label for="sourceLanguage">Source Language</label>
+							<select id="sourceLanguage" name="sourceLanguage">
+								<option value="{{ sourceToReview.sourceLanguage }}">{{ sourceToReview.sourceLanguage.displayName }}</option>
+							{% for lang in langs %}
+								{% if sourceToReview.sourceLanguage.displayName != lang.displayName %}
+								<option value="{{ lang.language }}">{{ lang.displayName }}</option>
+								{% endif %}
+							{% endfor %}
+							</select>
+						</div>
+						<div class="large-2 columns">
+							<label for="targetLanguage">Target Language</label>
+							<select id="{{ sourceToReview.targetLanguage.displayName }}" name="targetLanguage">
+								<option value="{{ sourceToReview.targetLanguage }}">{{ sourceToReview.targetLanguage.displayName }}</option>
+							{% for lang in langs %}
+								{% if sourceToReview.targetLanguage.displayName != lang.displayName %}
+								<option value="{{ lang.language }}">{{ lang.displayName }}</option>
+								{% endif %}
+							{% endfor %}
+							</select>
+						</div>
+						<div class="large-2 columns">
+							<label for="setNumber">Set Number</label>
+							<input id="setNumber" name="setNumber" type="text" value="{{ sourceToReview.setNumber }}">	
+						</div>
+						<div class="large-2 columns">
+							<label for="passageLetter">Passage Letter</label>
+							<select id="passageLetter" name="passageLetter">
+								<option value="{{ sourceToReview.passageLetter }}">{{ sourceToReview.passageLetter }}</option>
+								{% if sourceToReview.passageLetter != "A" %}
+									<option value="A">A</option>
+								{% endif %}
+								{% if sourceToReview.passageLetter != "B" %}
+									<option value="B">B</option>
+								{% endif %}
+								{% if sourceToReview.passageLetter != "C" %}
+									<option value="C">C</option>
+								{% endif %}
+							</select>
+						</div>
+						<div class="large-2 columns">
+							<label for="versionNumber">Version Number</label>
+							<input id="versionNumber" name="versionNumber" type="text" value="{{ sourceToReview.versionNumber }}">
+						</div>												
+					</div>
+					<div class="row"> 
+						<div class="large-12 columns">
+							<label for="sourcePassage">Source Passage Input</label>
+							<textarea style="height:650px" id="sourcePassage" name="sourcePassage">{{ sourceToReview.text }}</textarea>		
+						</div>
+					</div>
+					<div class="row">
+						<div class="large-12 columns">
+							<label for="comments">Problem Comments</label>
+							<textarea style="height:250px" id="comments" name="comments"></textarea>
+						</div>	
+					</div>
+
+					<input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource">
+					<input class="button radius" type="reset"  name="reset">
+				</form>
+		</div>
+	</div>
+{% endblock %}

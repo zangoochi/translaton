@@ -1,0 +1,17 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block body_block %}
+<div id="login" style="width:300px; margin: 100px auto 0 auto;">
+<form method="POST" action="/login/create-user/" id="newUserForm"> {% csrf_token %}
+<fieldset>
+<legend>New User</legend>
+{% csrf_token %}
+{{form}}
+</fieldset>
+<div class="row" style="text-align: center;">
+	<button type="submit" class="small button" value="Submit">Create User</button>
+</div>
+
+</form>
+</div>
+{% endblock %}

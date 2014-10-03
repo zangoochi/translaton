@@ -1,0 +1,100 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+
+	<div class="row" style="margin-top:50px">
+		<div class="small-12 columns t-center">
+			<ul class="workflow-button-group radius button-group">
+			  	<li><a href="#" data-dropdown="drop1" class="button small dropdown">Legacy Exam</a><br>
+					<ul id="drop1" data-dropdown-content class="f-dropdown">
+			  			<li><a href="/records/enter-exam/">Enter Legacy Exam</a></li>
+					</ul>
+				</li>
+			  	<li><a href="#" data-dropdown="drop2" class="button small dropdown">Source Text</a><br>
+					<ul id="drop2" data-dropdown-content class="f-dropdown">
+			  			<li><a href="/texts/enter-new-source/">Enter New Source Text</a></li>
+						<li><a href="/texts/list-of-all-source-texts/">List all sources</a></li>
+					</ul>
+				</li>	
+			  	<li><a href="#" data-dropdown="drop3" class="button small dropdown">Analysis</a><br>
+					<ul id="drop3" data-dropdown-content class="f-dropdown">
+			  			<li><a href="/analysis/">Analysis Workflow Page</a></li>
+			  			<li><a href="/analysis/gradedExams">View Graded Exams</a></li>		  						  
+					</ul>
+				</li>		  			  
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-12 small-centered columns panel callout radius profile-content">
+			<dl class="tabs" data-tab>
+			  	<dd><a href="#panel2-1">Exam Input</a></dd>
+				<dd><a href="#panel2-2">Target Text</a></dd>
+				<dd><a href="#panel2-3">Discrepancies</a></dd>
+			  	<dd><a href="#panel2-4">Source Queue</a></dd>				
+			  	<dd><a href="#panel2-5">Source Disc</a></dd>
+			  	<dd><a href="#panel2-6">Grading</a></dd>			
+			</dl>
+			<div class="tabs-content">
+			  	<div class="content" id="panel2-1">
+			    	<p>Exams to be inputed.</p>
+			  		
+			    	<p align="center">
+			    	<table style="margin-left: auto; margin-right: auto;">
+
+			    	{% for examToInput in examsToInput %}
+			  		<tr>
+			  			<td>Exam # {{ examToInput.exam.examNumber  }} </td>
+						<td><a href="/records/enter-exam-record/{{examToInput.exam.examNumber}}/{{ examToInput.targetTextNumber}}/">{% if examToInput.targetTextNumber == 1 %}  A {% else %} {{ examToInput.exam.secondPassage  }}  {% endif %}</a></td>
+			  		<tr/>
+			  		{% endfor %}
+
+			  		</table>
+			  		</p>
+			  	</div>
+				<div class="content" id="panel2-2">
+			    	<p>Target texts that need verified.</p>
+			  	
+			  		{% for targetTextToReview in targetTextsToReview %}
+			  		<p><a href="/records/verify-exam-record/{{ targetTextToReview.exam.examNumber }}/{% if targetTextToReview.exam.targetText1.pk == targetTextToReview.targetText.pk  %}1{% else %}2{% endif %}/">{{ targetTextToReview.exam.examNumber}}</a></p>
+			  		{% endfor %}
+			  	</div>			  				
+			  	<div class="content active" id="panel2-3">
+			    	<p>These have discrepancies.</p>		
+
+			    	{% for discrepancy in discrepancies %}
+			  		<p><a href="/grade/discrepancy-review/{{ discrepancy.pk  }}/">{{ discrepancy.pk  }}</a></p>
+			  		{% endfor %}
+			  	</div>
+			  	<div class="content" id="panel2-4">
+			    	<p>This area will be the queue for new source texts needing reviewed before being locked to database.</p>
+			    	{% for source in sourceReview %}
+	
+			    		<p></p>
+			    		<li><a href="/texts/review-source/{{ source.source.id }}/">{{source.source}} ----- Importer #1: {{ source.source.importer1.username }}</a></li>
+			    	{% endfor %}
+			  	</div>
+			  	<div class="content" id="panel2-5">
+			    	<p>Source text discrepencies.</p>
+			    	{% for source in sourceDiscrepency %}
+			    		<p></p>
+			    		<li><a href="/texts/review-source-descrepency/{{ source.originalSource.id }}/">{{source.originalSource}} ----- Importer #1: {{ source.originalSource.importer1.username }}</a></li>
+			    	{% endfor %}			    	
+			  	</div>
+			  	<div class="content" id="panel2-6">
+			    	<p>Exams to be highlighted/Graded.</p>
+			  	
+			    	{% for examToGrade in examsToGrade %}
+
+			    	<p><a href="/grade/exam/{{ examToGrade.exam.examNumber}}/{{ examToGrade.passageLetter }}/">{{ examToGrade.exam.examNumber}}</a></>
+
+			    	{% endfor %}
+
+			  	</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

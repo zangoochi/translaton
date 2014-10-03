@@ -1,0 +1,403 @@
+/////////////////////////////////////NEW BACKBONE CODE//////////////////////////////////////////////////////////
+//keeping track of all the errors so we know which one was the last to be highlighted
+var currentSourceError = new Object();
+var currentTargetError = new Object();
+var sourceErrors = new Array(); //holds the serialized highlight errors
+var targetErrors = new Array(); //holds the serialized highlight errors
+var isHighlighting = false;
+
+
+//Models
+Error = Backbone.Model.extend({
+  urlRoot: window.location.pathname + 'error/'
+});
+
+ErrorList = Backbone.Collection.extend({
+      model : Error,
+      url:  window.location.pathname + 'error/',
+});
+
+//Views
+//view for the modal dialog
+EditModalView = Backbone.View.extend({
+
+      el: $("#myModal"),
+      template: $("#edit-modal-template").html(),
+      
+      events: {
+        "click .save": "onSave", 
+        "click .cancel": "onCancel"
+      },
+
+      render: function(){
+          $(this.el).html(_.template(this.template, {model: this.model}));
+          $("#editErrorCode").val(this.model.get('errorCode'));
+          $(document).ready(function(){  $('#myModal').foundation('reveal', 'open'); });
+          return this;
+      },
+      onSave: function(){
+          this.model.set('errorNumber', $("#editErrorNumber").val());
+          this.model.set('errorCode', $("#editErrorCode").val());
+          this.model.set('comment', $("#editErrorComment").val());
+          this.model.set('pointsDeducted', $("#editErrorPointsDeducted").val());
+          this.model.save(); //async!!!
+          $('#myModal').foundation('reveal', 'close');
+      },
+      onCancel: function(){
+          $('#myModal').foundation('reveal', 'close');
+      }
+
+})
+
+//View for the single error. This will watch for changes in the individual rows
+ ErrorView = Backbone.View.extend({
+      
+      tagName: "tr",
+      template: $("#error-row-template").html(),
+      
+      events: {
+          "click .delete": "onDeleteClick",
+          "click .edit" : "onEditClick",
+          "click td": "errorClicked"
+      },
+
+      initialize: function(){
+          this.model.bind("change" , _.bind(this.render, this));
+      },       
+      render: function(){
+          $(this.el).html(_.template(this.template, {model: this.model}));
+          return this;
+      },
+      onDeleteClick: function(e){
+          this.trigger('deleteClicked', this.model);
+          e.stopPropagation(); //we don't need the event bublling up and scrolling the divs
+      },
+      onEditClick: function(e){
+          editModalView.model = this.model;
+          editModalView.render();
+          e.stopPropagation();
+      },
+      errorClicked: function(){
+          scrollErrorIntoView(this.model.get('errorNumber'));
+      }
+ });
+
+ //view for the total error points
+ TotalErrorPointsView = Backbone.View.extend({
+
+        el: $("#totalErrorPoints"),
+        initialize: function(){
+           this.collection.bind('add', _.bind(this.modelAdded, this));
+           this.collection.bind('remove', _.bind(this.render, this));
+        }, 
+        render: function(){
+            var totalPoints = this.collection.reduce(function(memo, value){ return memo + parseInt(value.get('pointsDeducted')) } , 0);
+            this.el.innerHTML = "TOTAl POINTS DEDUCTED: " + totalPoints;
+        }, 
+        modelAdded: function(model){
+            model.bind('change', _.bind(this.render, this));
+            model.bind('change', updateTooltipWithModel);
+            this.render();
+        }
+ });
+
+ //the view that stores all of the errors. this will add / remove rows from the table
+ ErrorCollectionView = Backbone.View.extend({
+      initialize: function(){
+          this.errorViews = [];
+          this.collection.bind('add', _.bind(this.add, this));
+          this.collection.bind('remove', _.bind(this.remove, this));
+      },
+      add: function(model){
+          var newErrorView = new ErrorView({model: model});
+          newErrorView.bind('deleteClicked', _.bind(this.removeModel, this));
+          
+          $(this.el).append(newErrorView.render().el);
+          this.errorViews.push(newErrorView);
+      },
+      remove: function(model){
+          var viewToRemove = _.select(this.errorViews, function(view){ return view.model == model })[0];
+          this.errorViews = _.without(this.errorViews, viewToRemove);
+          viewToRemove.$el.remove();
+      },
+      removeModel: function(model){
+          model.destroy();
+          removeHighlightWithErrorId(model.get('errorNumber'));
+      }
+ });
+
+//so we need to add the csrf token before every ajax call so django doesn't freak out
+var oldSync = Backbone.sync;
+Backbone.sync = function(method, model, options){
+    options.beforeSend = function(xhr){
+        xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+    };
+    return oldSync(method, model, options);
+};
+
+var errorList = new ErrorList();
+var errorCollectionView = new ErrorCollectionView({collection: errorList, el: $("#errorTable > tbody")});
+var totalErrorPointsView = new TotalErrorPointsView({collection: errorList });
+var editModalView = new EditModalView();
+errorList.fetch();
+
+//get all of the colors for the specified error codes
+var errorCodes = $('#slct1').find("option");
+var errorCodeMap = []
+for(var i = 0; i < errorCodes.length; ++i)
+{
+  errorCodeMap[errorCodes[i].getAttribute('value')] = errorCodes[i].getAttribute('data-color');
+}
+
+//////////////////////////////////////////////////LEGACY STUFF////////////////////////////////////////
+function removeHighlightWithErrorId(errorNumber)
+{
+  $("span[data-errorid='"+  errorNumber +"']").removeAttr('data-tooltip').removeAttr('style').removeAttr('class').removeAttr('title');
+  saveHighlightSerializationAsync();
+}
+
+function updateTooltipWithModel(errorModel)
+{
+    var colorToHighlight = errorCodeMap[errorModel.get("errorCode")];
+    var errorNumber = errorModel.get('errorNumber');
+
+    $("span[data-errorid='"+  errorNumber +"']")
+                            .attr('title', "Error #: "+  errorModel.get('errorNumber') + "   Error Code: " + errorModel.get('errorCode') + "  Points Deducted: " + errorModel.get('pointsDeducted') + " Comments: " + errorModel.get('comment'))
+                            .attr('style', 'background-color: '+ colorToHighlight +';');
+    saveHighlightSerializationAsync();
+}
+
+//get the exam number from the current url
+function getExamNumber()
+{
+  return window.location.pathname.split('/')[3];
+}
+
+//get the passage letter from the current url
+function getPassageLetter()
+{
+  return window.location.pathname.split('/')[4];
+}
+
+//return if the specified source text appears in the list of all of the errors
+//yea hashing would be faster put this needs to be done asap
+function isSourceTextDuplicate(highlightError, currentErrors)
+{
+  for(var i = 0; i < currentErrors.length; ++i)
+  {
+
+    if(currentErrors[i][1] == highlightError[1])
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+//returns the cookie with the specified name
+function getCookie(name) 
+{
+  var cookieValue = null;
+  if (document.cookie && document.cookie != '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+//return the 'current highlighted error' aka the one in the set that does not appear in the list that 
+//we currently have of all the errors
+function getCurrentHighlightedError(highlightSet, currentErrors)
+{
+
+  for(var i = 0; i < highlightSet.length; ++i)
+  {
+    if(!isSourceTextDuplicate(highlightSet[i], currentErrors))
+    {
+      return highlightSet[i];
+    }
+  }
+}
+
+function disableHighlighting()
+{
+   $('#source_grading_box').getHighlighter().unbindEvents();     
+   $('#target_box').getHighlighter().unbindEvents();
+   isHighlighting = false;
+}
+
+function enableHighlighting()
+{
+   $('#source_grading_box').getHighlighter().bindEvents();      
+   $('#target_box').getHighlighter().bindEvents();
+   isHighlighting = true;
+}
+
+function saveHighlightSerializationAsync()
+{
+    var postData = {csrfmiddlewaretoken: getCookie('csrftoken'), 
+                    sourceJSON : $('#source_grading_box').html(),
+                    targetJSON : $('#target_grading_box').html()};
+    $.ajax
+    ({
+        type: "POST",
+        url: "highlight/", 
+        data: postData
+    });  
+}
+
+function scrollErrorIntoView(errorID)
+{
+    //the top of the span we want to scroll to is the height of the span minus the height of the div (the relative height)
+    $('#source_grading_box').scrollTop($("span[data-errorid='"+ errorID +"']")[0].offsetTop - $('#source_grading_box')[0].offsetTop);
+    $('#target_grading_box').scrollTop($("span[data-errorid='"+ errorID +"']")[1].offsetTop - $('#target_grading_box')[0].offsetTop);
+}
+
+function onSpanMouseOver(span)
+{
+      
+
+      //on disjunct errors, we are going to chage the opacit to let the user know which error is linked to 
+      //the other one. on a normal one, we will change the color to show overlapping errors.
+      var errorType = span.getAttribute('data-errortype');
+      if(errorType == "DISJUNCT_ERROR")
+      {
+          var errorID = span.getAttribute('data-errorid');
+          $("span[data-errorid='"+  errorID  +"']").css('opacity', 0.5);
+      }
+      
+      else
+      {  
+        switch(span.getAttribute('data-node-position'))
+          {
+            case 'right':
+                span.previousSibling.style.backgroundColor = span.style.backgroundColor;
+                break;
+            case 'left':
+                span.nextSibling.style.backgroundColor = span.style.backgroundColor;
+                break;
+            case 'middle':
+                break;
+            case 'containing':
+                span.firstElementChild.style.backgroundColor = span.style.backgroundColor;
+                break;
+          }    
+      }
+}
+
+function onSpanMouseLeave(span)
+{
+      //see exlanation above, please.
+      var errorType = span.getAttribute('data-errortype');
+      if(errorType == "DISJUNCT_ERROR")
+      {
+          var errorID = span.getAttribute('data-errorid');
+          $("span[data-errorid='"+  errorID  +"']").css('opacity', 1);
+
+      }
+
+      switch(span.getAttribute('data-node-position'))
+      {
+          case 'right':
+              span.previousSibling.style.backgroundColor = 'pink';
+              break;
+          case 'left':
+              span.nextSibling.style.backgroundColor = 'pink';
+              break;
+          case 'middle':
+              break;
+          case 'containing':
+              span.firstElementChild.style.backgroundColor = span.firstElementChild.getAttribute('data-color');
+              break;
+      }
+}
+
+//format the start and end of the discontinous error like so...
+function getFormattedDiscontinuousErrorString(highlighter)
+{
+   return highlighter.hilightStack.pop() + "->" + highlighter.hilightStack.pop();
+}
+
+$(document).ready(function() {
+
+          var sourceHilighter = new Hilighter('#source_grading_box');
+          var targetHilighter = new Hilighter('#target_grading_box');
+          sourceHilighter.isHilighting = false;
+          targetHilighter.isHilighting = false;
+          //when the page first load, pull the serialeized hilighted state from the db so we can recreate
+          //what was hilighted before
+          $.ajax({
+          	type: "GET",
+          	url: "highlight/",
+          	dataType: "JSON",
+          	success:function(data)
+            {
+                $('#source_grading_box').html(data[0].fields.sourceJSON);
+          	    $('#target_grading_box').html(data[0].fields.targetJSON);
+          	    
+                //wire up the hover events that will hide / show the overlapping errors
+                $.each($('span'), function(index, value){
+
+                      value.onmouseover = function(){onSpanMouseOver(value);};
+                      value.onmouseout = function(){onSpanMouseLeave(value);};
+                });
+            }
+        });
+
+          //enable the highlighting when the start highlighting button is pressed       
+          $('#start_high').on('click' , function(){
+              sourceHilighter.isHilighting = true;
+              targetHilighter.isHilighting = true;
+          });
+
+          //disable the highlighting when the end highlighting button is pressed       
+          $('#end_high').on('click' , function(){
+              sourceHilighter.isHilighting = false;
+              targetHilighter.isHilighting = false;
+          });
+
+           //we are going to add the error to the database. the error is composed of the source highlighted word that was
+           //highlighted last and the targer highlighted word that was highlighted last.
+           $('#add_submit').on('click', function(){  
+           		
+                  var csrftoken      = getCookie('csrftoken');
+                  var errorCode      = $('#slct1').find(':selected').text();
+                  var errorType      = $('#errorType').find(':selected').val();
+                  var comment        = $('#comments').val();
+                  var pointsDeducted = $('#slct2').find(':selected').text();
+                  var examID         = getExamNumber();
+                  var passageLetter  = getPassageLetter();
+                  var errorNumber    = (errorList.length) + 1;
+                  var sourcePhrase   = (errorType == "NORMAL_ERROR") ? sourceHilighter.lastHilightedText : getFormattedDiscontinuousErrorString(sourceHilighter); //only works for continuous errors right now
+                  var targetPhrase   = (errorType == "NORMAL_ERROR") ? targetHilighter.lastHilightedText : getFormattedDiscontinuousErrorString(targetHilighter);
+                  var sourceJSON     = "";
+                  var targetJSON     = "";  //hack because i'm too lazy to change the schema
+                  var newErrorData   = {errorCode : errorCode, examID: examID, passageLetter : passageLetter, 
+                                      comment : comment, pointsDeducted : pointsDeducted, sourcePhrase : sourcePhrase, 
+                                      targetPhrase : targetPhrase, sourceJSON : sourceJSON, targetJSON : targetJSON, 
+                                      errorNumber : errorNumber, errorType: errorType };
+                  
+                  //make the backbone object (update the ID that gets added!) and change the highlighting colors / tooltips
+                  var newError = errorList.add(new Error(newErrorData));
+                  newError.save(null, { success:function(model, response){ newError.set('id', response.id)}});
+                 
+                  var colorToHighlight = $('#slct1').find(':selected').data("color");         
+                  //change the tooltip on the error, and change the errornumber from -1 so it's not changed in the future
+                  $("span[data-errorid='-1']")
+                    .attr('title', "Error #: "+  errorList.length.toString() + "   Error Code: " + 
+                         errorCode + "  Points Deducted: " + pointsDeducted + " Comments: " + comment)
+                    .attr('style', 'background-color: '+ colorToHighlight +';')
+                    .attr('data-errorid', errorList.length.toString())
+                    .attr('data-errortype', errorType);
+                  
+                  saveHighlightSerializationAsync();
+                  cancel();
+            })
+    });

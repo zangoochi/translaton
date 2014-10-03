@@ -1,0 +1,243 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+{% block body_block %}
+
+<script type="text/javascript">
+ $(document).ready(function(){
+     $("#Source_Language").multiselect({noneSelectedText: "Select Language"});
+     $("#Target_Language").multiselect({noneSelectedText: "Select Language"});
+     $("#Year").multiselect({noneSelectedText: "Select Years"});
+     $("#Exam").multiselect({noneSelectedText: "Select Exams"});
+     $("#Grader").multiselect({noneSelectedText: "Select Graders"});
+     $("#Passage").multiselect({noneSelectedText: "Select Passages"});
+});
+    function selectYears(){
+      
+       if ($("#Source_Language").val() && $("#Source_Language").val() != '4' && $("#Target_Language").val() != '4' ){
+            
+            $("#Target_Language").multiselect({selectedList: 1});
+          $("#Target_Language").val('4');
+          $("#Target_Language").multiselect("disable");
+        $("#Target_Language").multiselect("refresh");
+        
+       }
+       else if ($("#Source_Language").val() == null){
+              $("#Target_Language").multiselect({selectedList: 0});
+            $("#Target_Language").multiselect("enable");
+        $("#Target_Language").multiselect("refresh");
+
+       }
+      
+      if ($("#Target_Language").val() && $("#Target_Language").val() != '4' && $("#Source_Language").val() != '4' ){
+        
+          $("#Source_Language").multiselect({selectedList: 1});
+          $("#Source_Language").val('4');
+          $("#Source_Language").multiselect("disable");
+        $("#Source_Language").multiselect("refresh");
+        
+       }
+       else if ($("#Target_Language").val() == null){
+              $("#Source_Language").multiselect({selectedList: 0});
+            $("#Source_Language").multiselect("enable");
+        $("#Source_Language").multiselect("refresh");
+
+       }
+      
+      
+         if ($("#Source_Language").val() != '' && $("#Target_Language").val() != ''){
+
+            request_url = 'getParams';
+            $.ajax({
+                method: "get",
+                url: request_url,
+                data: "source=" + $("#Source_Language").val() + "&target=" + $("#Target_Language").val() + "&type=Years",
+
+               success: function(response) {
+                  document.getElementById("Year").innerHTML = response;
+                  $("#Year").multiselect("refresh");
+                  document.getElementById("Exam").innerHTML = '';
+                  $("#Exam").multiselect("refresh");
+                  document.getElementById("Passage").innerHTML = '';
+                  $("#Passage").multiselect("refresh");
+               },
+               failure: function(response){
+
+               }
+             });
+         } else {
+           }
+        }
+    function selectExams(){
+        if ($("#Year").val() != null){
+        request_url = 'getParams';
+            $.ajax({
+                method: "get",
+                url: request_url,
+                data: "year=" + $("#Year").val() + "&source=" + $("#Source_Language").val() + "&target=" + $("#Target_Language").val() + "&type=Exams",
+
+               success: function(response) {
+                   document.getElementById("Exam").innerHTML = response;
+                   $("#Exam").multiselect("refresh");
+                   document.getElementById("Passage").innerHTML = '';
+                   $("#Passage").multiselect("refresh");
+               },
+               failure: function(response){
+
+               }
+             });
+        }else{
+            document.getElementById("Exam").innerHTML = '';
+            $("#Exam").multiselect("refresh");
+            document.getElementById("Passage").innerHTML = '';
+            $("#Passage").multiselect("refresh");
+        }
+    }
+
+  function selectPassages(){
+      if ($("#Exam").val() != null){
+        request_url = 'getParams';
+            $.ajax({
+                method: "get",
+                url: request_url,
+                data: "value=" +  $("#Exam").val()   + "&type=Passages",
+
+               success: function(response) {
+                   document.getElementById("Passage").innerHTML = response;
+                   $("#Passage").multiselect("refresh");
+               },
+               failure: function(response){
+
+               }
+             });
+      }else{
+           document.getElementById("Passage").innerHTML = '';
+            $("#Passage").multiselect("refresh");
+      }
+    }
+
+
+    function generateGraph(type,format){
+        request_url = 'generateGraph';
+            $.ajax({
+                method: "get",
+                url: request_url,
+                data: "source=" + $("#Source_Language").val() + "&target=" + $("#Target_Language").val() +
+                        "&year=" +  $("#Year").val() +
+                        "&exam=" + $("#Exam").val() +
+                        "&passage=" + $("#Passage").val() +
+                        "&type=" + type +
+                        "&format=" + format,
+
+               success: function(response) {
+                  document.getElementById("plot_div").innerHTML = response;
+                
+               },
+               failure: function(response){
+               }
+             });
+    }
+
+
+</script>
+  <div class="row">
+    <div class="large-12 columns">
+      <h1>Analysis Queries</h1>     
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 small-centered columns panel callout radius profile-content">
+      <dl class="tabs" data-tab>
+          <dd><a href="#panel2-1">Main Analysis</a></dd>
+        <dd><a href="#panel2-2">User Analysis</a></dd>
+        <dd><a href="#panel2-3">Exam Analysis</a></dd>
+          <dd><a href="#panel2-4">Keyword In Context</a></dd>         
+      </dl>
+      <div class="tabs-content">
+          <div class="content" id="panel2-1">
+            <p>These will be already coded queries that will run with the push of a button. Nothing needed from user</p>
+          </div>
+        <div class="content" id="panel2-2">
+            <p>These will be queries that will take parameters from administrator and run queries that pertain to users</p>
+          </div>                
+          <div class="large-12 columns content active" id="panel2-3">
+                    <div class="row">
+                            <div class="large-2 columns">
+                                <label for="Source_Language" style="cursor: default">Source Language*</label>
+                                <select id="Source_Language" multiple="multiple" onchange="selectYears()">
+                               {% for lang in langs %}
+                                    <option value="{{ lang.id }}">{{ lang.displayName }}</option>
+                               {% endfor %}
+                                </select>
+                            </div>
+                            <div class="large-2 columns">
+                                <label for="Target_Language" style="cursor: default">Target Language*</label>
+                                <select id="Target_Language" multiple="multiple" onchange="selectYears()">
+                               {% for lang in langs %}
+                                    <option value="{{ lang.id }}">{{ lang.displayName }}</option>
+                               {% endfor %}
+                                </select>
+                             </div>
+                             <div class="large-2 columns">
+                                <label for="Year" style="cursor: default">Years*</label>
+                                <select id="Year" multiple="multiple" onchange="selectExams()">
+                                </select>
+                            </div>
+                             <div class="large-2 columns">
+                                <label for="Exam" style="cursor: default">Exams*</label>
+                                <select id="Exam" multiple="multiple" onchange="selectPassages()">
+                                </select>
+                            </div>
+                            <div class="large-2 columns">
+                                <label for="Passage" style="cursor: default">Passages*</label>
+                                <select id="Passage" multiple="multiple">
+                                </select>
+                            </div>
+                            <div class="large-2 columns">
+                                <label for="Grader" style="cursor: default">Graders</label>
+                                <select id="Grader" multiple="multiple" >
+                                </select>
+                            </div>
+                            </div>
+                       <div id="query" class="row" style="font-style:italic;font-size: 10pt;" > * required</div>
+                       <div class="row">
+                            <button type="button" class="small" onclick="generateGraph('passFail')">Pass/Fail Analysis</button>
+                            <button type="button" class="small" onclick="generateGraph('avgScore')">Avg. Score Analysis</button>
+                            
+                            <button data-dropdown="drop2" class="button small dropdown">Error Analysis</button>
+                <ul id="drop2" data-dropdown-content class="f-dropdown">
+                    <li><a onclick="generateGraph('errorBreakdown', 'byHalf')">By Half</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'byQuarter')">By Quarter</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'HalfwithScore')">By Half With Score</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'QuarterwithScore')">By Quarter With Score</a></li>
+                </ul>
+                
+                      </div>
+                      <div id="plot_div" align="center"></div>
+          </div>
+          <div class="content" id="panel2-4">
+            <p>Search Keywords</p>
+            <span style="display: inline;">
+              <input style="display:inline;" type="text" id="keywordSearch"></input> 
+              <button style="display:inline;" id="keywordButton">Search</button>
+            </span>
+          
+            <table id="keywordTable" style="margin:0 auto;">
+            </table>
+          
+            <ul class="pagination">
+
+          </ul>
+
+          </div>
+      </div>
+    </div>
+  </div>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.multiselect.css' %}" />
+  <script src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>
+  <script src="/static/js/jquery.multiselect.js"></script>
+  <script src="/static/js/underscore.js"></script>
+  <script src="/static/js/backbone.js"></script>
+  <script src="/static/js/keyword.js"></script>
+{% endblock %}
