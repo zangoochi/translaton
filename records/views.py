@@ -55,12 +55,13 @@ def enterExamRecord_internal(request, examNumber, targetText):
 	removeTargetTextFromInputQueue(exam, 1)
 	return render(request, 'records/temp_out.html', {'newRecord': exam})
 
-
+#Zach Montgomery: edited in iteration 2 week 4
 #enter a new exam into the database
 def enterNewExam(request):
 	if request.method == 'POST':
 		form = NewExamForm(request.POST)
 		
+		#Checks to determine if the form input is valid. 
 		if form.is_valid():
 			newExam = Exam(examNumber            = form.cleaned_data["examNumber"],
 					   	   secondPassage         = form.cleaned_data["secondPassage"],
@@ -81,27 +82,29 @@ def enterNewExam(request):
 			addTargetTextToInputQueue(newExam, 2)		
 			return redirect("/{0}/".format(request.user.username))
 		else:
+			#Zach Montgomery: all the variables needed in order to get the grader lanugagepairs
 			group = Group.objects.get(name='Grader')
 			graders = group.user_set.all()
-			language = LanguagePair.objects.filter(user_id = graders)
-			languages = Language.objects.all()
-			return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graders' : graders, 'language' : language, 'languages' : languages})
+			graderLanguages = LanguagePair.objects.filter(user_id = graders)
 
-	else:
-		#gets the group Grader because this section will be used only for getting the graders
+
+			return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages' : graderLanguages})
+
+	else: #Else gets called the first time the page loads when there had been no submit
+
+		
+		#Gets the group 'Grader' from the Group model 
 		group = Group.objects.get(name='Grader')
 		
 		#This is a set of all the users in the group 'Grader'
 		graders = group.user_set.all()
-		
-		#graders and their language pairs
-		language = LanguagePair.objects.filter(user_id = graders)
-		
-		#List of all the languages so you can get the graders language pair in english. Instead of 14 you can get spa or spanish
-		languages = Language.objects.all()
-						
-		
-		return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graders' : graders, 'language' : language, 'languages' : languages})
+
+		#Assigns graderLanguages all the graders and their language pairs
+		graderLanguages = LanguagePair.objects.filter(user_id = graders)
+				
+
+		#returns an empty form and all of the grader -- languagepair combinations		
+		return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages' : graderLanguages})
 		
 def listAllQuedRecords(request):
 	return render(request, 'records/list_all_qued_records.html', {'records' : Record.objects.all()})

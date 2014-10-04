@@ -9,16 +9,26 @@ for(var i = 0; i < sourceTexts.length; ++i)
     unfilteredSourceTexts[i] = sourceTexts[i];   
 }
 
+/* On form load, grader1 will include all the graders by default, so this sets 
+unfilteredGraders to be the list of graders before removing the graders that do
+not include the correct language in their languagepairs */
 var graders = document.getElementById('grader1').options;
 
 for(var i = 0; i < graders.length; ++i)
 {
     unfilteredGraders[i] = graders[i];        
 }     
-//wire up on change functions
+//Zach Montgomery: edited in iteration 2 week 4
+/* wire up on change functions by adding an even listener. If the event listener is called
+then the filterSelectBox() function is called. Want to listen to year, source language 
+and target language for limiting the options of the graders and source text files and also
+wants to listen to the grader 3 and 4 checkboxes because if they are not checked then there 
+should be no values for them. */
 document.getElementById("year").addEventListener('change', function(){filterSelectBox()});
 document.getElementById("sourceLanguage").addEventListener('change', function(){filterSelectBox()});
 document.getElementById("targetLanguage").addEventListener('change', function(){filterSelectBox()});
+document.getElementById("grader3cb").addEventListener('change', function(){filterSelectBox()});
+document.getElementById("grader4cb").addEventListener('change', function(){filterSelectBox()});
 
 //if one of the source or target languages is not english, set the other one to english
 function setlanguages()
@@ -34,18 +44,24 @@ function setlanguages()
     }
 }
 
-//remove all of the options, and read the ones that pass the filter
+//Zach Montgomery: edited in iteration 2 week 4
+//Remove all of the options, and read the ones that pass the filter
 function filterSelectBox()
 {
     setlanguages();
 
+    // Get all the variable from enter_exam.html in records templates
     var selectBox1 = document.getElementById('sourceText1');
     var selectBox2 = document.getElementById('sourceText2');
     var grader1    = document.getElementById('grader1');
     var grader2    = document.getElementById('grader2');
     var grader3    = document.getElementById('grader3');
     var grader4    = document.getElementById('grader4');
+    var grader3cb  = document.getElementById('grader3cb');
+    var grader4cb  = document.getElementById('grader4cb');
 
+    /*Removes all the objects from the options. This is why we previously saved
+     the data in unfilteredGraders */
     removeObjectsFromSelectBox(selectBox1);
     removeObjectsFromSelectBox(selectBox2);
     removeObjectsFromSelectBox(grader1);
@@ -53,7 +69,7 @@ function filterSelectBox()
     removeObjectsFromSelectBox(grader3);
     removeObjectsFromSelectBox(grader4);
 
-    //add filtered items to the source text select boxes
+    //Add filtered items to the source text select boxes
     var year = document.getElementById('year').value;
     var sourceLanguage = document.getElementById('sourceLanguage').value;
     var targetLanguage = document.getElementById('targetLanguage').value;
@@ -74,14 +90,13 @@ function filterSelectBox()
         }
     }
 
-    //add filtered items to the grader text boxes, which will only get added if the graders are able based on 
-    //their language pair
+    /* Add filtered items to the grader text boxes, which will only get added if the graders are able based on 
+    their language pair */
     for(var i = 0; i < unfilteredGraders.length; ++i)
     {
         var option = unfilteredGraders[i];
-        var gId = option.getAttribute('data-graderId');
         
-        //If the option has either the source language or target language, then add that as a viable option
+        //If the option (aka grader) has either the source language or target language, then add that grader as a viable option
         if((option.getAttribute('data-language') == sourceLanguage || option.getAttribute('data-language') == targetLanguage))
         {            
             //If return is an object then add grader to options
@@ -95,13 +110,15 @@ function filterSelectBox()
             {     
                 grader2.options.add(g2Option);                
             }  
+            /* Since grader 3 and 4 are based on availablity, if they are not needed
+            then do no give them any options and leave them as null */
             g3Option = createGraderOption(option, grader3.options, gId);
-            if(g3Option != -1)
+            if(g3Option != -1 && grader3cb.checked)
             {     
                 grader3.options.add(g3Option);                
             }  
             g4Option = createGraderOption(option, grader4.options, gId);
-            if(g4Option != -1)
+            if(g4Option != -1 && grader4cb.checked)
             {     
                 grader4.options.add(g4Option);                
             }  
@@ -113,7 +130,7 @@ function filterSelectBox()
  {
     document.getElementById('examNumberPDF').value = document.getElementById('examNumber').value;
  }
-
+//Zach Montgomery: edited in iteration 2 week 4
  function createGraderOption(option, graderOptions, graderId)
  {
      
@@ -122,13 +139,12 @@ function filterSelectBox()
     for(i=0; i<graderOptions.length; ++i)
     {        
         if(option.text == graderOptions[i].text){
-            check = true;
-                        
+            check = true;              
         }
     }
     var result = null;
     
-    //If option does not exist create new element
+    //If option does not exist, create new element
     //If option exists return -1
     if(check == false){
         if(document.createElement('option')){

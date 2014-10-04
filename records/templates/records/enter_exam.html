@@ -1,3 +1,5 @@
+<!-- Zach Montgomery: edited iteration 2 week 4 -->
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
@@ -85,23 +87,14 @@
              </div>
          </div>
 
+         <!-- Creates a select drop down with all of the graders and their language pairs. This data will be used to filter unwanted graders based on the source text and the target text provided -->
          <div class="row">
             <div class="small-6 small-centered columns">
                 <label for="grader1">Grader #1</label>
                 <select id="grader1" name="grader1">
-                    
-                    <!-- First loop goes through all graders. Then matches the graders with their language pairs. This allows us to 
-                          grab the graders username based off of the languages that they know. The next step is to get the actual language                             name from the grader language pair list  -->
-                    {% for grader in graders %}
-						{% for l in language %}
-							{% if l.user_id == grader.id %}
-								{% for lang in languages %}
-									{% if l.language_id == lang.id %}
-                    					<option data-language="{{ lang }}", data-graderId="{{grader.id}}"> {{ grader.username }}</option>
-									{% endif %}
-								{% endfor %}
-							{% endif %}
-						{% endfor %}
+                    <!-- Uses the graderLanguage variable in records/views.py EnterNewExam function. Loops through and gets all individual grader -> language pair combinations-->
+                    {% for grader in graderLanguages %}
+                    	<option data-language="{{ grader.language }}"> {{ grader.user }}</option>
                     {% endfor %}
                 </select>
                 {% for error in form.grader1.errors %}
@@ -114,16 +107,8 @@
             <div class="small-6 small-centered columns">
                 <label for="grader2">Grader #2</label>
                 <select id="grader2" name="grader2">
-                    {% for grader in graders %}
-						{% for l in language %}
-							{% if l.user_id == grader.id %}
-								{% for lang in languages %}
-									{% if l.language_id == lang.id %}
-                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
-									{% endif %}
-								{% endfor %}
-							{% endif %}
-						{% endfor %}
+                    {% for grader in graderLanguages %}
+                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
                     {% endfor %}
                 </select>
                 {% for error in form.grader2.errors %}
@@ -132,55 +117,41 @@
             </div>
         </div>
 
+    <!-- Checkbox to toggle whether or not graders 3 and graders 4 are available. The default is unchecked -->
 	Toggle grader 3: <input id="grader3cb" type="checkbox" onClick="validateGrader3()" /> </br>
 	Toggle grader 4: <input id="grader4cb" type="checkbox" onClick="validateGrader4()" />
 
+
 	<div style="visibility:hidden" id="grader3Div">
 	         <div class="row">
-	            <div class="small-6 small-centered columns">
-	                <label for="grader3">Grader #3</label>
-	                <select id="grader3" name="grader3">
-	                    {% for grader in graders %}
-							{% for l in language %}
-								{% if l.user_id == grader.id %}
-									{% for lang in languages %}
-										{% if l.language_id == lang.id %}
-	                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
-										{% endif %}
-									{% endfor %}
-								{% endif %}
-							{% endfor %}
-	                    {% endfor %}
-	                </select>
-	                {% for error in form.grader3.errors %}
-	                        <small class="error">{{  error  }}</small>
-	                {% endfor %}
-	            </div>
-	        </div>
+            <div class="small-6 small-centered columns">
+                <label for="grader3">Grader #3</label>
+                <select id="grader3" name="grader3">
+                    {% for grader in graderLanguages %}
+                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                    {% endfor %}
+                </select>
+                {% for error in form.grader3.errors %}
+                        <small class="error">{{  error  }}</small>
+                {% endfor %}
+            </div>
+        </div>
 	</div>
 
 	<div style="visibility:hidden" id="grader4Div">
 	         <div class="row">
-	            <div class="small-6 small-centered columns">
-	                <label for="grader4">Grader #4</label>
-	                <select id="grader4" name="grader4">
-	                    {% for grader in graders %}
-							{% for l in language %}
-								{% if l.user_id == grader.id %}
-									{% for lang in languages %}
-										{% if l.language_id == lang.id %}
-	                    					<option data-language="{{ lang }}"> {{ grader.username }}</option>
-										{% endif %}
-									{% endfor %}
-								{% endif %}
-							{% endfor %}
-	                    {% endfor %}
-	                </select>
-	                {% for error in form.grader4.errors %}
-	                        <small class="error">{{  error  }}</small>
-	                {% endfor %}
-	            </div>
-	        </div>
+            <div class="small-6 small-centered columns">
+                <label for="grader4">Grader #4</label>
+                <select id="grader4" name="grader4">
+                    {% for grader in graderLanguages %}
+                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                    {% endfor %}
+                </select>
+                {% for error in form.grader4.errors %}
+                        <small class="error">{{  error  }}</small>
+                {% endfor %}
+            </div>
+        </div>
 	</div>    
 
 	<script type="text/javascript">
