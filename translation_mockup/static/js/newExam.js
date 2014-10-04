@@ -18,7 +18,6 @@ for(var i = 0; i < graders.length; ++i)
 {
     unfilteredGraders[i] = graders[i];        
 }     
-//Zach Montgomery: edited in iteration 2 week 4
 /* wire up on change functions by adding an even listener. If the event listener is called
 then the filterSelectBox() function is called. Want to listen to year, source language 
 and target language for limiting the options of the graders and source text files and also
@@ -44,7 +43,6 @@ function setlanguages()
     }
 }
 
-//Zach Montgomery: edited in iteration 2 week 4
 //Remove all of the options, and read the ones that pass the filter
 function filterSelectBox()
 {
@@ -95,6 +93,7 @@ function filterSelectBox()
     for(var i = 0; i < unfilteredGraders.length; ++i)
     {
         var option = unfilteredGraders[i];
+        var gId = option.getAttribute('data-gId');
         
         //If the option (aka grader) has either the source language or target language, then add that grader as a viable option
         if((option.getAttribute('data-language') == sourceLanguage || option.getAttribute('data-language') == targetLanguage))
@@ -112,16 +111,30 @@ function filterSelectBox()
             }  
             /* Since grader 3 and 4 are based on availablity, if they are not needed
             then do no give them any options and leave them as null */
-            g3Option = createGraderOption(option, grader3.options, gId);
-            if(g3Option != -1 && grader3cb.checked)
-            {     
-                grader3.options.add(g3Option);                
-            }  
-            g4Option = createGraderOption(option, grader4.options, gId);
-            if(g4Option != -1 && grader4cb.checked)
-            {     
-                grader4.options.add(g4Option);                
-            }  
+            if(grader3cb.checked){
+                g3Option = createGraderOption(option, grader3.options, gId);
+                if(g3Option != -1)
+                {     
+                  grader3.options.add(g3Option);                
+                } 
+            }
+           if(!grader3cb.checked)
+            {
+                var eOption = new Option("null", g1Option.value);
+                grader3.options.add(eOption);
+            }
+            if(grader4cb.checked){
+                g4Option = createGraderOption(option, grader4.options, gId);
+                if(g4Option != -1)
+                {     
+                  grader4.options.add(g4Option);                
+                } 
+            }
+           if(!grader4cb.checked)
+            {
+                var eOption = new Option("null", g1Option.value);
+                grader4.options.add(eOption);
+            }
         }
     }
  }
@@ -130,10 +143,10 @@ function filterSelectBox()
  {
     document.getElementById('examNumberPDF').value = document.getElementById('examNumber').value;
  }
-//Zach Montgomery: edited in iteration 2 week 4
+
+//Zach Montgomery: edited n iteration 2 week 4
  function createGraderOption(option, graderOptions, graderId)
  {
-     
     var check = false;
     //check if grader already exists in options
     for(i=0; i<graderOptions.length; ++i)
@@ -174,3 +187,4 @@ function filterSelectBox()
      selectBox.remove(i);
     }
  }
+ window.alert("here");

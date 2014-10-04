@@ -60,17 +60,17 @@ def enterExamRecord_internal(request, examNumber, targetText):
 def enterNewExam(request):
 	if request.method == 'POST':
 		form = NewExamForm(request.POST)
-		
 		#Checks to determine if the form input is valid. 
 		if form.is_valid():
+			print "OH YES"
 			newExam = Exam(examNumber            = form.cleaned_data["examNumber"],
 					   	   secondPassage         = form.cleaned_data["secondPassage"],
 					   	   aPassageMarkings      = False, 
 					       secondPassageMarkings = False,
 					       grader1               = int(form.cleaned_data["grader1"]),
 					       grader2               = int(form.cleaned_data["grader2"]),
-					       grader3               = int(form.cleaned_data["grader3"]),
-					       grader4               = int(form.cleaned_data["grader4"]),
+					       grader3               = form.cleaned_data["grader3"],
+					       grader4               = form.cleaned_data["grader4"],
 					       sourceText1           = SourceText.objects.all().get(pk = form.cleaned_data["sourceText1"]),
 					       sourceText2           = SourceText.objects.all().get(pk = form.cleaned_data["sourceText2"]),
 					       sourceLanguage        = Language.objects.all().get(language = form.cleaned_data["sourceLanguage"]),
@@ -87,12 +87,10 @@ def enterNewExam(request):
 			graders = group.user_set.all()
 			graderLanguages = LanguagePair.objects.filter(user_id = graders)
 
-
-			return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages' : graderLanguages})
+			return render(request, 'records/enter_exam.html', {'form' : form, 'graderLanguages' : graderLanguages})
 
 	else: #Else gets called the first time the page loads when there had been no submit
 
-		
 		#Gets the group 'Grader' from the Group model 
 		group = Group.objects.get(name='Grader')
 		

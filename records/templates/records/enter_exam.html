@@ -94,7 +94,9 @@
                 <select id="grader1" name="grader1">
                     <!-- Uses the graderLanguage variable in records/views.py EnterNewExam function. Loops through and gets all individual grader -> language pair combinations-->
                     {% for grader in graderLanguages %}
-                    	<option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                    	<option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
+                    }
+                    }
                     {% endfor %}
                 </select>
                 {% for error in form.grader1.errors %}
@@ -108,7 +110,7 @@
                 <label for="grader2">Grader #2</label>
                 <select id="grader2" name="grader2">
                     {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
                     {% endfor %}
                 </select>
                 {% for error in form.grader2.errors %}
@@ -128,7 +130,7 @@
                 <label for="grader3">Grader #3</label>
                 <select id="grader3" name="grader3">
                     {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
                     {% endfor %}
                 </select>
                 {% for error in form.grader3.errors %}
@@ -144,7 +146,7 @@
                 <label for="grader4">Grader #4</label>
                 <select id="grader4" name="grader4">
                     {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}"> {{ grader.user }}</option>
+                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
                     {% endfor %}
                 </select>
                 {% for error in form.grader4.errors %}
@@ -166,7 +168,6 @@
                 grader3Div.style.visibility = "visible";
             }else{
                 grader3Div.style.visibility = "hidden";
-                g3.value = null;
             }
         };
         
@@ -177,7 +178,6 @@
                 grader4Div.style.visibility = "visible";
             }else{
                 grader4Div.style.visibility = "hidden";
-                g4.value = null;
             }
         };
 	</script>
