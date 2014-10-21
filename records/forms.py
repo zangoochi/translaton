@@ -16,11 +16,17 @@ def _getGraderTuples():
     return map(lambda g: (g.id, g.username), graders)
 
 class NewExamForm(forms.Form):
+
 	#static fields
-	year = forms.CharField(widget=forms.TextInput(attrs={"id" : "year"}))
-	examNumber = forms.CharField()
+	year = forms.CharField(initial='2014', 
+			widget=forms.TextInput(attrs={"id" : "year", 'type': 'number', 'min': '2005', 'max': '2099', 'required': True})) # Year Condition is set in this line.
+	#year = forms.CharField(widget=forms.TextInput(attrs={"id" : "year"}))
+	
+	examNumber = forms.CharField(initial='00001', widget=forms.TextInput) # Exam Number Condition is set in this line.
+	
 	secondPassage  = forms.ChoiceField(choices = [("B", "B"), ("C", "C")])
 
+	#dynamic fields
 	def __init__(self, *args, **kwargs):
 		super(NewExamForm, self).__init__(*args, **kwargs)
 
@@ -39,6 +45,7 @@ class NewExamForm(forms.Form):
 	def clean_year(self):
 		year_cleaned = self.cleaned_data.get('year')
 
+		# if-statement to check that the year input is numeric
 		if not year_cleaned.isnumeric():
 			raise ValidationError("Please enter a valid year")
 		else:
@@ -47,10 +54,15 @@ class NewExamForm(forms.Form):
 	def clean_examNumber(self):
 		examNumber_cleaned = self.cleaned_data.get('examNumber')
 
+		# if-statement to check that the examNumber input is numeric, not in use, and five-digit integer
 		if not examNumber_cleaned.isnumeric():
 			raise ValidationError("Please enter a valid exam number.")
 		elif Exam.objects.filter(examNumber = examNumber_cleaned).count() != 0:
 			raise ValidationError("That exam number is already in use.")
+		elif len(examNumber_cleaned) > 5:
+				raise ValidationError("Exam Number is Unpermitted.Please Enter a Exam Set Number.")
+		elif len(examNumber_cleaned) < 5:
+				raise ValidationError("Exam Number is Unpermitted.Please Enter a Exam Set Number.")
 		else:
 			return examNumber_cleaned
 

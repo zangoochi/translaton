@@ -16,50 +16,62 @@
 
                 {% csrf_token %}
 
+				<!-- Year input -->
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="year">Year</label>
+                        <span data-tooltip aria-haspopup="true" class="tip-left" title="Year input must be four-digit integer">
+						<label for="year">Year<font color="red">*</font></label></span>
                         {{ form.year }}
+						
                         {% for error in form.year.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
                     </div>
                 </div>
 
+				<!-- Exam Number input -->
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="examNumber">Exam Number</label>
-                        {{form.examNumber }}
+                        <span data-tooltip aria-haspopup="true" class="tip-left" title="Exam Number must be five-digit integer">
+						<label for="examNumber">Exam Number<font color="red">*</font></label></span>
+						{{form.examNumber }}
+						
                         {% for error in form.examNumber.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
                     </div>
                 </div>
 
+				<!-- Source Language drop-down list -->
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="sourceLanguage">Source Language</label>
+                        <label for="sourceLanguage">Source Language<font color="red">*</font></label>
                         {{form.sourceLanguage}}
+						
                         {% for error in form.sourceLanguage.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
                     </div>
                 </div>
 
+				<!-- Target Language drop-down list -->
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="targetLanguage">Target Language</label>
+                        <label for="targetLanguage">Target Language<font color="red">*</font></label>
                         {{form.targetLanguage}}
+						
                         {% for error in form.targetLanguage.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
                     </div>
                 </div>
                 
+				<!-- Second Passage Letter drop-down list -->
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="secondPassage">Second Passage</label>
+                        <label for="secondPassage">Second Passage<font color="red">*</font></label>
                         {{form.secondPassage}}
+						
                         {% for error in form.secondPassage.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
@@ -68,8 +80,9 @@
 
                 <div class="row">
                     <div class="small-6 small-centered columns">
-                        <label for="sourceText1">Source Text 1</label>
+                        <label for="sourceText1">Source Text 1<font color="red">*</font></label>
                         {{form.sourceText1}}
+						
                         {% for error in form.sourceText1.errors %}
                         <small class="error">{{  error  }}</small>
                         {% endfor %}
@@ -79,8 +92,9 @@
 
              <div class="row">
                 <div class="small-6 small-centered columns">
-                    <label for="sourceText2">Source Text 2</label>
+                    <label for="sourceText2">Source Text 2<font color="red">*</font></label>
                     {{form.sourceText2}}
+					
                     {% for error in form.sourceText2.errors %}
                         <small class="error">{{  error  }}</small>
                     {% endfor %}
@@ -90,7 +104,7 @@
          <!-- Creates a select drop down with all of the graders and their language pairs. This data will be used to filter unwanted graders based on the source text and the target text provided -->
          <div class="row">
             <div class="small-6 small-centered columns">
-                <label for="grader1">Grader #1</label>
+                <label for="grader1">Grader #1<font color="red">*</font></label>
                 <select id="grader1" name="grader1">
                     <!-- Uses the graderLanguage variable in records/views.py EnterNewExam function. Loops through and gets all individual grader -> language pair combinations-->
                     {% for grader in graderLanguages %}
@@ -107,7 +121,7 @@
 
          <div class="row">
             <div class="small-6 small-centered columns">
-                <label for="grader2">Grader #2</label>
+                <label for="grader2">Grader #2<font color="red">*</font></label>
                 <select id="grader2" name="grader2">
                     {% for grader in graderLanguages %}
                         <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
