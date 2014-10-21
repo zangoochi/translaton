@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import auth
 from django.contrib.auth.models import User, Group
 from login.forms import NewUserForm
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 def index(request):
@@ -55,7 +56,7 @@ def createUser(request):
             userCheck = User.objects.all()
             for user in userCheck:
                 if username == user.username:
-                    return HttpResponse("User already exists")
+                     HttpResponse("User already exists.")
             #create user object in the auth_user table
             u = User.objects.create_user(username, email, password)
             u.first_name = firstName
@@ -98,8 +99,23 @@ def createUser(request):
         
     #return the form. 
     return render(request, 'login/create_new_user.html/', {'form': form})
-      
+
+#Zach Montgomery added on 10/14/14
+#creates view for a user to change passwords.
+def password_change(request):
+    if request.method == "POST":
+
+        #creates Django pre-made form PasswordChangeForm
+        form = PasswordChangeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/accounts/password/change/done')
+    return render_to_response('password_change_form.html', args)
     
+#Zach Montgomery added on 10/14/14
+#creates view for after a user changes his/her passwords
+def password_change_done(request):
+    return render_to_response('password_change_done.html') 
 
 
 

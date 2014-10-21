@@ -15,6 +15,7 @@ class Grader(models.Model):
 	lastName = models.CharField(max_length=32)
 	language1 = models.ForeignKey(Language, related_name='+')
 	language2 = models.ForeignKey(Language, related_name='+')
+	language3 = models.ForeignKey(Language, related_name='+')
 
 	def __unicode__(self):
 		return "{0} - {1}".format(self.graderID, self.lastName)
@@ -228,6 +229,8 @@ class TargetText(models.Model):
 	
 	def isLocked():
 		return importer1 is not None and importer2 is not None
+
+
 		
 	def __unicode__(self):
 		return "TARGET TEXT {0} {1}".format(self.pk, self.pdfURI)

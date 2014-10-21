@@ -1,3 +1,19 @@
+/*
+=====================================================================================================
+Description:
+Css code for grading page and also includes css code for verifying target texts. 
+It cretes css for side by side windows and control buttons
+=====================================================================================================
+
+Edited by: Zach Montgomery
+Date: 10/18/14
+Contact info: zmontgom@kent.edu
+Changes made: Added verify_frame_next, verify_frame, and verify_text to include styling for verifying
+				target	 
+*/
+
+
+
 .grade_div
 {
 display:none;
@@ -32,6 +48,15 @@ float:right;
 
 }
 
+.verify_frame_next
+{
+
+width:49%;
+height:65%;
+float:right;
+
+}
+
 .form_css
 {
 margin-right: auto;
@@ -46,6 +71,13 @@ height: 300px;
 float: left;
 }
 
+.verify_frame
+{
+width:50%;
+height: 65%;
+float: left;
+}
+
 .frame_text
 {
 width:100%;
@@ -55,6 +87,17 @@ border: thin solid black;
 overflow: auto;
 text-align: left;
 height: 250px;
+}
+
+.verify_text
+{
+width:100%;
+padding: 1em;
+background-color: white;
+border: thin solid black;
+overflow: auto;
+text-align: left;
+height: 500px;
 }
 
 .left

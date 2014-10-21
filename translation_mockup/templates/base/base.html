@@ -21,15 +21,15 @@
 				<li class="name">
 					<h1><a style="padding-left:0px" href="/">Translation</a></h1>
 				</li>
-				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
 
 			<section class="top-bar-section">
 				<!-- Right Nav Section -->
 				<ul class="right">
 					{% if user.is_authenticated %}
+					<li><a style="align:center" href="/admin">Admin</a></li>
 					<li><a href="/login/logout/"> Logout </a></li>
-					<li><a style="padding-right:0px" href="/profile/{{ user }}/">{{ user }}</a></li>
+					<li><a href="/profile/{{ user }}/">{{ user }}</a></li>
 					{% else %}
 					<li><a href="/login/"> Login </a></li>
 					{% endif %}

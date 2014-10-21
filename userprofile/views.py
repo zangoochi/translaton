@@ -14,6 +14,3 @@ def index(request, userName):
 	return render(request, 'userprofile/index.html', {'user': user, 
 													  'group': user.groups.all().first(),
 													  'userLangs': userLangs})
-
-
-

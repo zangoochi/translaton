@@ -1,10 +1,25 @@
+<!--
+=====================================================================================================
+Description:
+Template for verifying an exam record. Includes the Exam year, source and text language, and version number, 
+	This template also includes a side-by-side view of the source texts along with the submitted target text. This allows
+	the user to verify that the target text goes along with the correct source text. 
+=====================================================================================================
+
+Edited by: Zach Montgomery
+Date: 10/18/14
+Contact info: zmontgom@kent.edu
+Changes made: Changed the view to incorporate the side by side view that allows the user to see the source text. 
+					This is used as verification to check that the target text belongs to the correct source text.	 
+-->
+
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
 
 {% block body_block %}
-	<h1>Enter a Legacy Graded Exam</h1>
-	<h4>inputs will be drop down selects with options pulled from databse table</h4>
+	<h1>Enter Target Text for <b>{{exam}}</b></h1>
 	<div class="row panel callout radius">
 		<div class="large-12 columns">
 			<form action="/records/verify-exam-record/{{ exam.examNumber }}/{% if passageNumber == '1' %}1{% else %}2{% endif %}/" method="post">{% csrf_token %}
@@ -34,24 +49,38 @@
 						<input id="versionNumber" name="versionNumber" type="text" value="{{  exam.sourceText1.versionNumber  }}" disabled>
 					</div>												
 				</div>
-				<div class="row"> 
-					<div class="large-12 columns">
-						<label for="sourcePassage">Source Passage Input</label>
-						<textarea style="height:650px" id="text" name="text">{% if passageNumber == "1" %}{{ exam.targetText1.text }}{% else %}{{ exam.targetText2.text }}{% endif %}		
-						</textarea>		
-					</div>
+
+
+			<section class="side-by-side">
+			<div>
+				<div class="float-l verify_frame" id="source_box">
+					<h4>Source Text</h4>
+
+						<div class="verify_text"  id="source_grading_box" name ="source">
+							{% if passageNumber == "1" %}{{ exam.sourceText1.text}}{% else %}{{ exam.sourceText2.text }}{% endif %}
+						</div>
+
 				</div>
+
+				<div class="float-l verify_frame_next" id="target_box" name="target">
+					<h4>Target Text</h4>
+						<div class="verify_text"  id="target_grading_box">
+							<textarea style="height:100%" id="text" name="text">{% if passageNumber == "1" %}{{ exam.targetText1.text }}{% else %}{{ exam.targetText2.text }}{% endif %}		
+						</textarea>			
+						</div>
+				</div>
+			</div>	
+
 
 				<div class="row">
 						<div class="large-12 columns">
 							<label for="comments">Problem Comments</label>
 							<textarea style="height:250px" id="comments" name="comments"></textarea>
 						</div>	
-					</div>
+				</div>
 				
-				<input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource">
+				<input class="button radius" type="submit" value="Submit Source" name="submitSource">
 				<input class="button radius" type="reset"  name="reset">
-
 				<input class="button radius" type="button" id="pdf" name="pdf" value="View PDF Scan" onclick="return popup('/static/pdf/example.pdf', 'PDF Scan')"/>
 			</form>
 		</div>

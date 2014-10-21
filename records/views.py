@@ -1,3 +1,26 @@
+#=====================================================================================================
+#Description:
+#Css code for grading page and also includes css code for verifying target texts. 
+#It cretes css for side by side windows and control buttons
+#=====================================================================================================
+
+#Edited by: Zach Montgomery
+#Date: 10/18/14
+#Contact info: zmontgom@kent.edu
+#Changes made: Added verify_frame_next, verify_frame, and verify_text to include styling for verifying target	
+
+#Date:10/20/14
+#Contact Info: zmontgom@kent.edu
+#Changes made: In enter exam record, removed where the exam was being passed to another importer. 
+#					This removes the functionality of reviewing exam input data, but gets us down to 
+#					a functioning project where this functionality can then be build off of.
+
+#Changes made: Check that both target texts for the exam are submitted. Once both parts are submitted
+#					then send both parts to the graderExamInput queue to be graded. 
+
+#=====================================================================================================
+
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django import template
 from django.shortcuts import get_object_or_404, render, redirect
@@ -37,23 +60,31 @@ def enterExamRecord(request, examNumber="1", passageNumber="1"):
 			exam.targetText2 = newTargetText
 		
 		exam.save()
-		addTargetTextToReviewQueue(newTargetText, exam)
+
+#=====================================================================================================
+		#This part commented out would be used to send the new exam 
+		#to the exam review queue. This part would be for the second 
+		#importer to review the target text to verify that it is correct. 
+#=====================================================================================================
+
+		#addTargetTextToReviewQueue(newTargetText, exam)
+
+
 		removeTargetTextFromInputQueue(exam, int(passageNumber))
+
+
+		#Adds the exam to the grader queue once the targetText1 and targetText2 are both submitted
+		if exam.targetText1 is not None and exam.targetText2 is not None:
+			addExamToGraderQueue(exam, 'A')
+			addExamToGraderQueue(exam, exam.secondPassage)
+	
+
 		return redirect("/{0}/".format(request.user.username))
 			
 	#render the add new target text form
 	else:		
 		return render(request, 'records/enter_exam_record.html', {'exam': exam, 'passageNumber' : passageNumber})
 
-def enterExamRecord_internal(request, examNumber, targetText):
-	newTargetText = TargetText(text      = postData["text"], 
-								   importer1 = User.objects.get(username = request.user.username))
-	newTargetText.save()
-	exam.targetText1 = newTargetText
-	exam.save()
-	addTargetTextToReviewQueue(newTargetText, exam)
-	removeTargetTextFromInputQueue(exam, 1)
-	return render(request, 'records/temp_out.html', {'newRecord': exam})
 
 #Zach Montgomery: edited in iteration 2 week 4
 #enter a new exam into the database
@@ -62,21 +93,27 @@ def enterNewExam(request):
 		form = NewExamForm(request.POST)
 		#Checks to determine if the form input is valid. 
 		if form.is_valid():
-			print "OH YES"
 			newExam = Exam(examNumber            = form.cleaned_data["examNumber"],
 					   	   secondPassage         = form.cleaned_data["secondPassage"],
 					   	   aPassageMarkings      = False, 
 					       secondPassageMarkings = False,
-					       grader1               = int(form.cleaned_data["grader1"]),
-					       grader2               = int(form.cleaned_data["grader2"]),
+					       grader1               = form.cleaned_data["grader1"],
+					       grader2               = form.cleaned_data["grader2"],
 					       grader3               = form.cleaned_data["grader3"],
 					       grader4               = form.cleaned_data["grader4"],
 					       sourceText1           = SourceText.objects.all().get(pk = form.cleaned_data["sourceText1"]),
 					       sourceText2           = SourceText.objects.all().get(pk = form.cleaned_data["sourceText2"]),
 					       sourceLanguage        = Language.objects.all().get(language = form.cleaned_data["sourceLanguage"]),
 					       targetLanguage        = Language.objects.all().get(language = form.cleaned_data["targetLanguage"]))
-                
-			newExam.save()
+            
+			if(newExam.grader1 != newExam.grader2):    
+				newExam.save()
+			else:
+				group = Group.objects.get(name='Grader')
+				graders = group.user_set.all()
+				graderLanguages = LanguagePair.objects.filter(user_id = graders)
+
+				return render(request, 'records/enter_exam.html', {'form' : form, 'graderLanguages' : graderLanguages})
 			#add the two targets text to the input queue
 			addTargetTextToInputQueue(newExam, 1)
 			addTargetTextToInputQueue(newExam, 2)		
@@ -107,31 +144,40 @@ def enterNewExam(request):
 def listAllQuedRecords(request):
 	return render(request, 'records/list_all_qued_records.html', {'records' : Record.objects.all()})
 	
-#the user submitted the request (target text) for the second (or more) time, and it needs to be verified with what was before
-def verifyExamRecord(request, examNumber, passageNumber):
 
-	exam = Exam.objects.get(examNumber = examNumber)
-	if passageNumber == "1":
-		targetToVerify = exam.targetText1
-	else:
-		targetToVerify = exam.targetText2
-	
-	if request.method == "POST":
-		#verify that the POST data matches what is in the DB
-		targetToVerify.importer2 = request.user
-		targetToVerify.save()
+#=========================================================================================================================
+#Used to send the target text to be verified. This section does work but the Discrepency portion of the code does not work
+#Need to add a new TargetDiscrepencyQueue in the models to finish this code. For now we are not going to do target verification
+#=========================================================================================================================
+
+##the user submitted the request (target text) for the second (or more) time, and it needs to be verified with what was before
+#def verifyExamRecord(request, examNumber, passageNumber):
+#
+#	exam = Exam.objects.get(examNumber = examNumber)
+#	if passageNumber == "1":
+#		targetToVerify = exam.targetText1
+#	else:
+#		targetToVerify = exam.targetText2
+#
+#
+#	if request.method == "POST":
+#		#verify that the POST data matches what is in the DB
+#		targetToVerify.importer2 = request.user
+#		targetToVerify.save()
+
+
 		
 		#add to the discrepency table, and have the other person view the diff
-		removeTargetTextFromReviewQueue(targetToVerify)
-		discrepencyObject = Discrepancy(text = targetToVerify, 
-											modifiedText = request.POST["text"].strip(), 
-											user = targetToVerify.importer1,
-											numTimesVerified = 0,
-											comments = request.POST["comments"])
-		discrepencyObject.save()
-		return redirect("/{0}/".format(request.user.username))
-	else:
-		return render(request, 'records/verify_exam_record.html', {'exam': exam, 'passageNumber' : passageNumber})
+#		removeTargetTextFromReviewQueue(targetToVerify)
+#		discrepencyObject = Discrepancy(text = targetToVerify, 
+#											modifiedText = request.POST["text"].strip(), 
+#											user = targetToVerify.importer1,
+#											numTimesVerified = 0,
+#											comments = request.POST["comments"])
+#		discrepencyObject.save()
+#		return redirect("/{0}/".format(request.user.username))
+#	else:
+#		return render(request, 'records/verify_exam_record.html', {'exam': exam, 'passageNumber' : passageNumber})
 
 		
 	

@@ -24,9 +24,11 @@ class NewExamForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(NewExamForm, self).__init__(*args, **kwargs)
 
-		#dynamically create fields for the form so that the choices can be updated without restarting the server
-		for i in range(4):
-			self.fields["grader{0}".format(i+1)] = forms.ChoiceField(choices = _getGraderTuples())
+		self.fields['grader1'] = forms.ChoiceField(choices = _getGraderTuples())
+		self.fields['grader2'] = forms.ChoiceField(choices = _getGraderTuples())
+		self.fields['grader3'] = forms.ChoiceField(choices = _getGraderTuples())
+		self.fields['grader4'] = forms.ChoiceField(choices = _getGraderTuples())
+
 
 		for i in range(2):
 			self.fields["sourceText{0}".format(i+1)] = forms.ChoiceField(choices = _getSourceTextTuples(), widget=forms.Select(attrs={"id" : "sourceText{0}".format(i+1)}))
@@ -51,7 +53,14 @@ class NewExamForm(forms.Form):
 			raise ValidationError("That exam number is already in use.")
 		else:
 			return examNumber_cleaned
-			
+
+	def clean_grader2(self):
+		grader1 = self.cleaned_data.get('grader1')
+		grader2 = self.cleaned_data.get('grader2')
+
+		if grader1 == grader2:
+			raise forms.ValidationError("Grader 1 and Grader 2 must be different")
+		return grader2
 
 
 

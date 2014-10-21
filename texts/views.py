@@ -49,8 +49,11 @@ def reviewSourceText(request, sourceId):
 			sourceText.save()
 			queue.delete()
 		else:
+			#delete queue item from the sourceReviewQueue
 			queue.delete()
 			langs = Language.objects.all()
+
+			#Saves data to sourceDiscrepancy
 			sourceDiscrep = sourceDiscrepancyQueue(importer1 = sourceText.importer1,
 				   								   importer2 = user,
 				   								   needsToReview = sourceText.importer1,

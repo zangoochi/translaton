@@ -1,4 +1,4 @@
-//save a copy of all of the oprions for filtering
+//Save a copy of all of the oprions for filtering
 var unfilteredSourceTexts = new Array();
 var unfilteredGraders     = new Array();
 
@@ -18,7 +18,7 @@ for(var i = 0; i < graders.length; ++i)
 {
     unfilteredGraders[i] = graders[i];        
 }     
-/* wire up on change functions by adding an even listener. If the event listener is called
+/* Wire up on change functions by adding an even listener. If the event listener is called
 then the filterSelectBox() function is called. Want to listen to year, source language 
 and target language for limiting the options of the graders and source text files and also
 wants to listen to the grader 3 and 4 checkboxes because if they are not checked then there 
@@ -51,15 +51,17 @@ function filterSelectBox()
     // Get all the variable from enter_exam.html in records templates
     var selectBox1 = document.getElementById('sourceText1');
     var selectBox2 = document.getElementById('sourceText2');
+
     var grader1    = document.getElementById('grader1');
     var grader2    = document.getElementById('grader2');
     var grader3    = document.getElementById('grader3');
     var grader4    = document.getElementById('grader4');
+
     var grader3cb  = document.getElementById('grader3cb');
     var grader4cb  = document.getElementById('grader4cb');
 
     /*Removes all the objects from the options. This is why we previously saved
-     the data in unfilteredGraders */
+     the data in unfilteredGraders and unfilteredSourceTexts*/
     removeObjectsFromSelectBox(selectBox1);
     removeObjectsFromSelectBox(selectBox2);
     removeObjectsFromSelectBox(grader1);
@@ -80,7 +82,7 @@ function filterSelectBox()
         var optionYear       = option.text.substring(8, 12);
 
         
-
+        //Only add to the select box if the sourceText, targetText and year all match
         if ( optionSourceText == sourceLanguage && optionTargetText == targetLanguage && optionYear == year)
         {
             selectBox1.options.add(createSourceTextOption(option));
@@ -109,8 +111,11 @@ function filterSelectBox()
             {     
                 grader2.options.add(g2Option);                
             }  
-            /* Since grader 3 and 4 are based on availablity, if they are not needed
-            then do no give them any options and leave them as null */
+            /* As of previous database design, grader 3 and grader 4 must have a value, so give them the 
+            value of the first grader. If checking for graders, only input the graders that you need. 
+            Just because grader 3 and grader 4 exist, does not mean that they were assigned. To change 
+            database to fix this, must delete Exam, and all the other tables that Exam link to such as 
+            graders, targetText, sourceText etc.  */
             if(grader3cb.checked){
                 g3Option = createGraderOption(option, grader3.options, gId);
                 if(g3Option != -1)
@@ -144,7 +149,7 @@ function filterSelectBox()
     document.getElementById('examNumberPDF').value = document.getElementById('examNumber').value;
  }
 
-//Zach Montgomery: edited n iteration 2 week 4
+//Zach Montgomery: edited in iteration 2 week 4
  function createGraderOption(option, graderOptions, graderId)
  {
     var check = false;
@@ -187,4 +192,3 @@ function filterSelectBox()
      selectBox.remove(i);
     }
  }
- window.alert("here");
