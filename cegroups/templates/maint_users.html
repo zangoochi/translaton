@@ -1,0 +1,167 @@
+<!--
+=====================================================================================================
+Description:
+Template on the admin site for creating, editing, and deleting users. This template will be interactive and 
+allow the admin to click on the parts of the table to edit the specific parts of the user. 
+=====================================================================================================
+
+Edited by: Zach Montgomery
+Date: 10/29/14
+Contact info: zmontgom@kent.edu
+Changes made: Created this template 
+
+Date: 11/04/14
+Changes Made: NOTE: Hitting enter submits all data fields.
+	In viewing users, now have a password column that you can click and type password which is hidden. Changed 
+	how the admin insert emails and passwords for the user. At first, used normal form that validates email and password
+	so that if you make a mistake, the system will catch it and you will not change the password to something you didnt know. Since it's
+	the admin account, if a mistake in typing is made, he/she can just change it as long as they know their own passwords. Also included 
+	a drop down for changing user groups. This automatically saves on change. Default value is current Group. Uses JQuery to handle all client side form manipulation.
+
+--> 
+{% load staticfiles %}
+
+<dl id="maintUserMenu" data-tab>
+	<dd>
+		<a id="btnViewUser" href="#userview"><button type="button" class="small">View/Edit</button></a>
+		<a id="btnCreateUser" href="#usercreate"><button type="button" class="small">Create</button></a>
+		<a id="btnDeleteUser" href="#userdelete"><button type="button" class="small">Delete</button></a>
+	</dd>
+</dl>
+<span class="tabs-content">
+	<span class="content" id="usercreate">
+
+		<form method="POST" action="/cegroups/saveuseroption/" id="newUserForm"> 
+		{% csrf_token %}
+			<fieldset>
+				<legend>New User</legend>
+				{% csrf_token %}
+				{{form}}
+			</fieldset>
+			<div class="row" style="text-align: center;">
+				<button type="submit" class="small button" value="Submit">Create User</button>
+			</div>
+		</form>
+	</span>
+	
+	<span class="content" id="userdelete">
+		<form action="removeuseroption/" method="POST">
+			{% csrf_token %}
+			<table>
+				<tr><th>Delete</th><th>User</th></tr>
+				{% for user in users %}
+				<tr>
+					<td><input style="float:left; margin:0 auto; width:100%" type="checkbox" name="usertodelete" value="{{user.id}}" /></span></td>
+					<td>{{user}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="userview">
+		<table>
+			<tr>
+				<th>User</th>
+				<th>Group</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Email</th>
+				<th>Last Login</th>
+
+			</tr>
+			{% for user in users %}
+			<tr>
+				<td>{{user}}</td>
+
+				{% if user.groups.all.first != None %}
+					<td id ='g'><div class="group" name="{{user.id}}" value="{{user.groups.all.first}}">{{user.groups.all.first}}</div></td>
+				{% else %}
+					<td id = 'g'><div class="group" name="{{user.id}}" value="{{user.groups.all.first}}"> </div> </td>
+				{% endif %}
+				<td id='f'><div class="fname" name="{{user.id}}">{{user.first_name}}</div></td>
+				<td id='l'><div class="lname" name="{{user.id}}">{{user.last_name}}</div></td>
+				<td id='e'><div class="uemail" name="{{user.id}}">{{user.email}}</div></td>
+				<td>{{user.last_login}}</td>
+				<td id='p'><div class='changePass' name="{{user.id}}"><span style='color:blue'>Change Password</span></div></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</span>
+</span>
+
+
+<!-- JQuery that is used to manipulate the table so that a user can click on the certain element
+	in order to be able to change that attribute for the user. Example would be to click the users first name
+	and a form comes up to allow the admin to change the users first name.   
+
+	How it works: 
+
+		First we define what happens when a certain element in the body is clicked. In this case it is the specific table columns. 
+		After we have the element 'this' we find its children which is a div tag. This div is a placeholder in the table to hold
+		the users information until this point. Without the div, there is no way to specify the exact user since at this point the data
+		is just a table. Once we have the information we need, we can create our form to edit the table such as email, first_name, last_name, password, and groups. The view for these check first if it is an email, password, firstname, or lastname form and then
+		does the specific actions depending on the form. -->
+
+<script type="text/javascript">
+	$('body').on('click', '#f', function(){
+
+		var uid = $(this).children('.fname').attr('name');
+
+		$(this).children('.fname').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<input name=" + uid + " placeholder='First Name'/> <button type='submit' style='float:left; padding:0px;'/><input type='hidden' name='firstSubmit'/></form>");
+
+		$(this).children('.fname').remove();
+	});
+
+	$('body').on('click', '#l', function(){
+
+		var uid = $(this).children('.lname').attr('name');
+
+		$(this).children('.lname').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<input name=" + uid + " placeholder='Last Name'/><input type='hidden' name='lastSubmit'/></form>");
+
+		$(this).children('.lname').remove();
+	});
+
+	$('body').on('click', '#e', function(){
+		var uid = $(this).children('.uemail').attr('name');
+
+		$(this).children('.uemail').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<input name=" + uid + " placeholder='email' /><input type='hidden' name='emailSubmit'/></form>");
+		$(this).children('.uemail').remove();
+
+	});
+
+	$('body').on('click', '#g', function(){
+
+		var uid = $(this).children('.group').attr('name');
+		var ugroup = $(this).children('.group').attr('value');
+
+		$(this).children('.group').after("<form id='groupForm' action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<select id='select' name=" + uid + " placeholder='password'>\
+			{% for group in groups %}\
+				<option value='{{group}}'>{{group}}</option>\
+			{% endfor %}\
+			</select>\
+			<input type='hidden' value='Submit' name='groupSubmit'/></form>");
+
+			$('#select option[value="' + ugroup + '"]').prop('selected', true);
+			$('#select').change(function(){
+				this.form.submit();
+
+			});
+
+		$(this).children('.group').remove();
+	});
+
+	$('body').on('click', '#p', function(){
+		var uid = $(this).children('.changePass').attr('name');
+
+		$(this).children('.changePass').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<input name=" + uid + " type='password'/><input type='hidden' name='passSubmit'/></form>");
+		$('.changePass').remove();
+
+	});
+
+</script>

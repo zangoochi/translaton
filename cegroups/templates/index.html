@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+<div class="row">
+	<div class="large-12 columns">
+  		<h1>Administration</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="small-12 small-centered columns panel callout radius profile-content">
+		<div class="center-tabs">
+
+			<dl class="tabs" data-tab data-options="deep_linking:true;">
+				<dd><a href="#users">Users</a></dd>
+				<dd><a href="#groups">Groups</a></dd>
+				<dd><a href="#permissiontypes">Permission Types</a></dd>
+				<dd><a href="#permissionobjects">Permission Objects</a></dd>
+			</dl>
+		</div>
+
+		<div class="tabs-content">
+			<div class="content" id="users">
+				<div class="row">
+				{% include "maint_users.html" %}
+				</div>
+			</div>
+			<div class="content" id="groups">
+				<div class="row">
+					<p>Not implemented yet.<br>Future: Create groups; edit groups; set user membership; set group permissions for objects</p>
+				</div>
+			</div>
+			<div class="content" id="permissiontypes">
+				<div class="row">
+					{% include "maint_perm_types.html" %}
+				</div>
+			</div>
+			<div class="content" id="permissionobjects">
+				<div class="row">
+					<p>Not implemented yet.<br>Future: Create permission objects; edit permission objects; set parent relations</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{{varname}}
+{% AdminCheck "False" as "varname" %}
+{% endblock %}

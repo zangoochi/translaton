@@ -2437,9 +2437,16 @@ div.switch {
     [data-magellan-expedition] .sub-nav .active {
       line-height: 1.8em; }
 
+
+.center-tabs {
+  width: 100%;
+  text-align: center;
+}
+
 .tabs {
   *zoom: 1;
-  margin-bottom: 0 !important; }
+  margin-bottom: 0 !important; 
+  display: inline-block;}
   .tabs:before, .tabs:after {
     content: " ";
     display: table; }

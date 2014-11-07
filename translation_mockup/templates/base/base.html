@@ -1,3 +1,24 @@
+<!--
+=====================================================================================================
+Description:
+Base page that loads all files, js files, as well as contains the main header navigation which includes
+	Translation, admin-nav, logout-nav, and user-nav
+=====================================================================================================
+Edited by: Zach Montgomery
+Date: 10/29/14
+Contact info: zmontgom@kent.edu
+Changes made: Added jquery function to traverse object permissions based off of user group permissions. 
+				This is the only function you will need because as long as the base page is loaded in any 
+				template, which should ALWAYS be true, then the JQuery will run and hide all items. 
+
+				The JQuery script calls userObjects which is in translation_mockup/templatetags def: userObjects. 
+				The template tag is a context processor which is variables that are automatically loaded for every page. 
+				By creating the template tags and giving the path in translation_mockup/settings.py under TEMPLATE_CONTEXT_PROCESSORS. As long as the base class is loaded into the page, this will get all user 
+				objects and remove them. If there is no user, then the userObjects are empty and nothing is removed. 
+				Works the same for admin, since admin shouldn't be hidden from anything, their objects will return empty so nothing is removed.			    		
+-->
+
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
@@ -6,10 +27,11 @@
 
 	{% block title %}<title>ATA Translation</title>{% endblock %}
 	{% load staticfiles %}
+	{% load translation_extras %}
+
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/foundation.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/grade.css' %}" />
-	<script type="text/javascript" src="{% static 'js/grade.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/modernizr.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/dropzone.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
@@ -19,7 +41,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a style="padding-left:0px" href="/">Translation</a></h1>
+					<h1><a id="trans-nav" style="padding-left:0px" href="/">Translation</a></h1>
 				</li>
 			</ul>
 
@@ -27,9 +49,9 @@
 				<!-- Right Nav Section -->
 				<ul class="right">
 					{% if user.is_authenticated %}
-					<li><a style="align:center" href="/admin">Admin</a></li>
-					<li><a href="/login/logout/"> Logout </a></li>
-					<li><a href="/profile/{{ user }}/">{{ user }}</a></li>
+					<li><a id="admin-nav" style="align:center" href="/cegroups">Admin</a></li>
+					<li><a id="logout-nav" href="/login/logout/"> Logout </a></li>
+					<li><a id="user-nav" href="/profile/{{ user }}/">{{ user }}</a></li>
 					{% else %}
 					<li><a href="/login/"> Login </a></li>
 					{% endif %}
@@ -42,5 +64,45 @@
 	<script src="{% static 'js/fastclick.js' %}"></script>
 	<script src="{% static 'js/foundation.min.js' %}"></script>
 	<script>$(document).foundation();</script>
+	<script type="text/javascript" src="{% static 'js/grade.js' %}"></script>
+
+
+
+<!--Script that uses JQuery to remove elements within a page. This calls
+	userObjects which is in translation_mockup/templatetags def: userObjects. 
+	The template tag is a context processor which is variables that are automatically loaded
+	for every page. By creating the template tags and giving the path in translation_mockup/settings.py
+	under TEMPLATE_CONTEXT_PROCESSORS. As long as the base class is loaded into the page, this will get 
+	all user objects and remove them. If there is no user, then the userObjects are empty and nothing
+	is removed. Works the same for admin, since admin shouldn't be hidden from anything, their objects
+	will return empty so nothing is removed.  -->
+	<script type="text/javascript">
+		{% for userob in userObjects %}
+
+			var name = '#' + '{{userob.permObject.objectName}}';
+			$(name).remove();
+		{% endfor %}
+
+	</script>
+
+
+
+<!--	/*<script type="text/javascript">
+
+		$('body').click(function(event){
+
+    	var id = event.target.id;
+    	//var id=$(this).attr('id');
+    	alert (id);
+
+		});
+
+		$('[type=submit]').each(function () {
+			alert("submit link");
+			this.remove()
+
+		});
+	</script> */-->
+
 </body>
 </html>

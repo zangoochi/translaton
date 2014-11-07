@@ -1,3 +1,18 @@
+#=====================================================================================================
+#Description:
+#Django form for entering new exams. All exams have the fields: year, exam number, secondPassage, graders,
+#source language, target language, and the source texts that are a part of the exam.
+#=====================================================================================================
+
+
+
+
+#=====================================================================================================
+
+
+
+
+
 from django import forms
 from django.contrib.auth.models import User, Group
 from texts.models import Language, SourceText, Grader, Exam

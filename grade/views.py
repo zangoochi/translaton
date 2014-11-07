@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from texts.utils import findDifferenceInTexts
 from django.core import serializers
 import json
+from login.filters import *
 
 def index(request):
     return render(request, 'grade/index.html', {})
@@ -75,7 +76,7 @@ def insertHighlightJSON(request, examNumber, passageLetter):
 		exam = Exam.objects.get(examNumber = examNumber)
 		return HttpResponse(serializers.serialize("json", ErrorJSON.objects.filter(exam = exam.pk, passageLetter = passageLetter)), mimetype="application/json")
 
-
+@is_grader
 def gradeExam(request, examNumber="-1", passageLetter="A"):
 	if request.method == 'POST':
 		examErrors = request.POST

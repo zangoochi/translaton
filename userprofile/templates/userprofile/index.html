@@ -1,3 +1,17 @@
+<!--
+=====================================================================================================
+Description:
+Template for the userprofile page. This page will display information about the user such as the user languages, 
+group, email, last login, account created date, etc.  
+=====================================================================================================
+
+Edited by: Zach Montgomery
+Date: 10/18/14
+Contact info: zmontgom@kent.edu
+Changes made: Added button for changing user email address. 	 
+-->
+
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
@@ -22,7 +36,7 @@
 									<td>Name: </td><td>{{ user.get_full_name }}</td>
 								</tr>
 								<tr>
-									<td>Email: </td><td>{{ user.email }}</td>
+									<td><a href="/login/change-email" style="color:black">Email:</a> </td><td>{{ user.email }}</td>
 								</tr>
 								<tr>
 									<td>Last Login: </td><td>{{ user.last_login }}</td>
@@ -37,7 +51,7 @@
 						<div class="samll-12 columns" style="margin-left:10px">
 							<ul class="button-group radius">
 								<li><a href="/accounts/password-change/" class="button tiny" style="color:#fff">Change Password</a></li>
-								<li><a href="change-email" class="button tiny" style="color:#fff">Change Email</a></li>
+								<li><a href="/login/change-email" class="button tiny" style="color:#fff">Change Email</a></li>
 							</ul>
 						</div>
 					</div>	

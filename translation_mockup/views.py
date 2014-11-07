@@ -3,9 +3,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from texts.models import TargetReviewQueue, TargetInputQueue, GraderQueue, SourceText, sourceReviewQueue, sourceDiscrepancyQueue
 from userprofile.models import LanguagePair
+from cegroups.models import permObjects, groupPermissions
+from django.contrib.auth.models import User, Group
 
 def index(request):
 	user = request.user
+
 	if user.is_authenticated():
 		return redirect(reverse(workFlow, args=[user.username]))
 	else:
@@ -21,15 +24,16 @@ def workFlow(request, userName):
 		filteredTargetTexts = getFilteredTargetTexts(user, userLanguages)
 		examsToInput        = getFilteredExamsToInput(user, userLanguages)
 		examsToGrade        = getFilteredExamsToGrade(user, userLanguages)
+
+
 		return render(request, 'home/workflow.html', {'user': user,
-													  'group': user.groups.all().first(), 
 													  'targetTextsToReview' : filteredTargetTexts,
 													  'examsToInput'		: examsToInput,
 													  'examsToGrade'        : examsToGrade,
 													  'discrepancies'       : discrepancies,
 												      'sourceReview'        : sourceReviewQueue.objects.getQueue(user),
-												      'sourceDiscrepency'   : sourceDiscrepancyQueue.objects.filter(needsToReview = user)})
-
+												      'sourceDiscrepency'   : sourceDiscrepancyQueue.objects.filter(needsToReview = user),
+												      })
 
 ##############################################################################################
 #returns a list of filtered target texts that the specified user will be able to verify	
@@ -44,3 +48,4 @@ def getFilteredExamsToInput(user, userLanguages):
 #returns a list of filteres exams that the specified user will be ablt to grade
 def getFilteredExamsToGrade(user, userLanguages):
 	return filter(lambda e: e.exam.sourceLanguage in userLanguages and e.exam.targetLanguage in userLanguages , GraderQueue.objects.all())
+

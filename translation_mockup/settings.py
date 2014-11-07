@@ -7,6 +7,11 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
+#=================================================================================================
+#Edited By: Zach Montgomery
+#Date: 10/30/14
+#Changes Made: Added template CONTEXT PROCESSOR for user objects
+#=================================================================================================
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -39,10 +44,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'translation_mockup',
     'sidebyside',
     'userprofile',
     'texts',
     'records',
+    'cegroups',
     #'analysis',
     'grade',
     'login',
@@ -118,4 +125,5 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
+    'translation_mockup.templatetags.translation_extras.userObjects',
 )

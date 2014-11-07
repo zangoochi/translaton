@@ -1,19 +1,16 @@
 #=====================================================================================================
 #Description:
-#Css code for grading page and also includes css code for verifying target texts. 
-#It cretes css for side by side windows and control buttons
+#Views for exams. This is the logic behind entering new exams, and the data input for those exams. 
 #=====================================================================================================
 
 #Edited by: Zach Montgomery
-#Date: 10/18/14
-#Contact info: zmontgom@kent.edu
-#Changes made: Added verify_frame_next, verify_frame, and verify_text to include styling for verifying target	
-
 #Date:10/20/14
 #Contact Info: zmontgom@kent.edu
 #Changes made: In enter exam record, removed where the exam was being passed to another importer. 
 #					This removes the functionality of reviewing exam input data, but gets us down to 
-#					a functioning project where this functionality can then be build off of.
+#					a functioning project where this functionality can then be build off of. Also commented
+#					out the view for verifying exam records. Since we are removing the functionality of reviewing 
+#					the exams, this part will not be needed. 
 
 #Changes made: Check that both target texts for the exam are submitted. Once both parts are submitted
 #					then send both parts to the graderExamInput queue to be graded. 
@@ -41,7 +38,14 @@ FILE_UPLOAD_DIR = os.path.join(settings.BASE_DIR, 'static','pdf')
 
 #1rst following view def will be deleted once login and session is in place
 def index(request):
-	return render(request, 'records/index.html', {})
+	group = Group.objects.get(name='Grader')
+		
+	#This is a set of all the users in the group 'Grader'
+	graders = group.user_set.all()
+
+	#Assigns graderLanguages all the graders and their language pairs
+	graderLanguages = LanguagePair.objects.filter(user_id = graders)
+	return render(request, 'records/index.html', {'graderLanguages': graderLanguages})
 
 #enter a new target text into the DB
 def enterExamRecord(request, examNumber="1", passageNumber="1"):
@@ -123,6 +127,8 @@ def enterNewExam(request):
 			group = Group.objects.get(name='Grader')
 			graders = group.user_set.all()
 			graderLanguages = LanguagePair.objects.filter(user_id = graders)
+			languages = LanguagePair.objects.all()
+			print languages;
 
 			return render(request, 'records/enter_exam.html', {'form' : form, 'graderLanguages' : graderLanguages})
 
@@ -133,10 +139,10 @@ def enterNewExam(request):
 		
 		#This is a set of all the users in the group 'Grader'
 		graders = group.user_set.all()
-
 		#Assigns graderLanguages all the graders and their language pairs
 		graderLanguages = LanguagePair.objects.filter(user_id = graders)
-				
+		print graderLanguages
+
 
 		#returns an empty form and all of the grader -- languagepair combinations		
 		return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages' : graderLanguages})

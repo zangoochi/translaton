@@ -58,7 +58,17 @@
 							
 						<!--MAIN CONTROL BUTTONS-->
 						<div id="control_buttons" >
-							<input type="button" class="button" {%if targetText.doneGrading%} style="display:none" {% endif%}id="add" name="add" value="Add Error" onclick="return showAddError();" />&nbsp;
+							<input type="hidden" {%if targetText.doneGrading%} style="display:none" {% endif%}id="add" name="add" value="Add Error" onclick="return showAddError();" />&nbsp;
+
+
+							 <script type="text/javascript">
+							 	$(document).ready(function(){
+							 		$('#add').load(showAddError())});
+
+							</script>
+
+
+
 							<input type="button" class="button" id="add_quality_pts" {%if targetText.doneGrading%} style="display:none" {% endif%} name="add_quality_pts" value="Add Quality Points" onclick="return showQtyPts();" />&nbsp;
 							<br/>
 							<input type="button" id="show_errors" name="show_errors" value="Show All Errors" onclick="return showCommentTable();" class="button"/>&nbsp;
@@ -70,6 +80,11 @@
 							<form id="add_errors_form" method="post">{% csrf_token %}
 								<br/>
 								<input type="button" id="start_high" value="Begin Highlighting" onclick="highlight_buttons();" class="button" />&nbsp;
+
+								<script type="text/javascript">
+									$('#start_high').trigger("cl");
+								</script>
+
 								<input type="button" id="end_high" value="End Highlighting" onclick="return showAddErrorMenu();" class="button" />
 								&nbsp;
 								<br/>

@@ -1,0 +1,70 @@
+
+<dl id="maintPermTypesMenu" data-tab>
+	<dd>
+		<a id="btnViewPermType" href="#view"><button type="button" class="small">View</button></a>
+		<a id="btnCreatePermType" href="#create"><button type="button" class="small">Create</button></a>
+		<a id="btnEditPermType" href="#edit"><button type="button" class="small">Edit</button></a>
+		<a id="btnDeletePermType" href="#delete"><button type="button" class="small">Delete</button></a>
+	</dd>
+</dl>
+<span class="tabs-content">
+	<span class="content" id="create">
+		<form action="savepermoption/" method="POST">
+			{% csrf_token %}
+			<table id="txtPermissionTypeDescription">
+				<tr>
+					<td>New Permission Type:</td>
+					<td><input id="description" name="description" /></td>
+				</tr>
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="edit">
+		<form action="savepermoption/" method="POST">
+			{% csrf_token %}
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Description</th>
+				</tr>
+				{% for permoption in permoptions %}
+				<tr>
+					<td>{{permoption.id}}</td>
+					<td><input id="{{permoption.id}}" name="{{permoption.id}}" value="{{permoption.description}}" /></td>
+				</tr>
+				{% endfor %}
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="delete">
+		<form action="removepermissionoption/" method="POST">
+			{% csrf_token %}
+			<table>
+				<tr><th>Delete</th><th>Description</th></tr>
+				{% for permoption in permoptions %}
+				<tr>
+					<td><input style="float:left; margin:0 auto; width:100%" type="checkbox" name="todelete" value="{{permoption.id}}" /></span></td>
+					<td>{{permoption.description}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="view">
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Description</th>
+			</tr>
+			{% for permoption in permoptions %}
+			<tr>
+				<td>{{permoption.id}}</td>
+				<td>{{permoption.description}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</span>
+</span>

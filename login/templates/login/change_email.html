@@ -1,0 +1,29 @@
+<!--
+=====================================================================================================
+Description:
+Template for a user to change his/her email address. Uses Django form ChangeEmailForm from forms.py. 
+=====================================================================================================
+Created by: Zach Montgomery
+Date: 10/18/14
+Contact info: zmontgom@kent.edu
+=====================================================================================================
+-->
+
+
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block body_block %}
+<div id="login" style="width:300px; margin: 100px auto 0 auto;">
+<form method="POST" action="/login/change-email/"> {% csrf_token %}
+<fieldset>
+<legend>Change Email</legend>
+{% csrf_token %}
+{{form}}
+</fieldset>
+<div class="row" style="text-align: center;">
+	<button type="submit" class="small button" value="Submit">Change Email</button>
+</div>
+
+</form>
+</div>
+{% endblock %}

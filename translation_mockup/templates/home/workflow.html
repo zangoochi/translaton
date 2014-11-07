@@ -1,3 +1,53 @@
+<!--
+=====================================================================================================
+Description:
+The workflow page is the main page of the translation project. This page will hold the buttons that allow a user 
+create legacy exams, source texts, and run analysis on the data held in the database. The page includes tabs that separate
+the different parts of the translation software. These include exams that still need the target texts inputted in 
+"Exam Input", Exams that still need to be graded in "Grading", as well as discrepencies in graded exams in "Discrepencies"
+=====================================================================================================
+
+Edited by: Zach Montgomery
+Date: 10/23/14
+Contact info: zmontgom@kent.edu
+Changes made: Added names for single elements so that we can run permission checking on them and remove the option if the user
+				does not have the appropriate permissions. Names will be given to: Drop down buttons for Legacy Exams, Source Texts, and Analysis, along with the different tabs.  
+				
+
+             _________________________div id: drop-down-nav____________________________________
+			|	 ____________________    _____________________     ________________________    | 
+			|	|Legacy Exam:        |  |Source Text:         |   |Analysis:               |   |
+			|	| id: exam-drop-down |	| id: source-drop-down|   | id: analysis-drop-down |   |
+			|	|____________________|  |_____________________|   |________________________|   |
+			|__________|_______________________|____________________________|__________________|
+				       V                       V                            V
+			 	
+			  __ul id: drop1_________    ___ul id: drop2________    ______ul id: drop3___________
+			 |	 __________________  |  |  ___________________  |  |   ________________________  |
+			 |	|Enter Legacy Exam:| |  | | Enter Source Text | |  |  | Analysis Workflow Page | |
+			 |	|   id: enter-exam | |  | |   id: enter-source| |  |  |    id: analysis-page   | |
+			 |	|__________________| |  | |___________________| |  |  |________________________| |
+			 |_______________________|	| | View all sources  | |  |  |  View Graded Exams     | |
+									    | |	 id: view-source  | |  |  |    id: view-graded     | |
+										| |___________________| |  |  |________________________| |
+									    |_______________________|  |_____________________________|
+
+
+	__id: exam-tab_____id: target-tab___id: discrep-tab____id: source-queue-tab____id: source-discrep-tab____id: grade-tab___
+   |                 |                |                  |                      |                          |                 |
+   |   Exam Input    |  Target Text   |   Discrepencies  |      Source Queue    |      Source Discrep      |     Grading     |
+   |_________________|________________|__________________|______________________|__________________________|_________________|
+
+
+=====================================================================================================
+Edited by: Zach Montgomery
+Date: 10/28/14
+Contact info: zmontgom@kent.edu
+Changes made: Added jquery function to traverse object permissions based off of user group permissions  			    						
+-->
+
+
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
@@ -6,22 +56,22 @@
 
 	<div class="row" style="margin-top:50px">
 		<div class="small-12 columns t-center">
-			<ul class="workflow-button-group radius button-group">
-			  	<li><a href="#" data-dropdown="drop1" class="button small dropdown">Legacy Exam</a><br>
+			<ul id="drop-down-nav" class="workflow-button-group radius button-group">
+			  	<li><a id="exam-drop-down" href="#" data-dropdown="drop1" class="button small dropdown">Legacy Exam</a><br>
 					<ul id="drop1" data-dropdown-content class="f-dropdown">
-			  			<li><a href="/records/enter-exam/">Enter Legacy Exam</a></li>
+			  			<li><a id="enter-exam" href="/records/enter-exam/">Enter Legacy Exam</a></li>
 					</ul>
 				</li>
-			  	<li><a href="#" data-dropdown="drop2" class="button small dropdown">Source Text</a><br>
+			  	<li><a id="source-drop-down" href="#" data-dropdown="drop2" class="button small dropdown">Source Text</a><br>
 					<ul id="drop2" data-dropdown-content class="f-dropdown">
-			  			<li><a href="/texts/enter-new-source/">Enter New Source Text</a></li>
-						<li><a href="/texts/list-of-all-source-texts/">List all sources</a></li>
+			  			<li><a id="enter-source" href="/texts/enter-new-source/">Enter New Source Text</a></li>
+						<li><a id="view-source" href="/texts/list-of-all-source-texts/">List all sources</a></li>
 					</ul>
 				</li>	
-			  	<li><a href="#" data-dropdown="drop3" class="button small dropdown">Analysis</a><br>
+			  	<li><a id="analysis-drop-down" href="#" data-dropdown="drop3" class="button small dropdown">Analysis</a><br>
 					<ul id="drop3" data-dropdown-content class="f-dropdown">
-			  			<li><a href="/analysis/">Analysis Workflow Page</a></li>
-			  			<li><a href="/analysis/gradedExams">View Graded Exams</a></li>		  						  
+			  			<li><a id="analysis-page" href="/analysis/">Analysis Workflow Page</a></li>
+			  			<li><a id="view-graded" href="/analysis/gradedExams">View Graded Exams</a></li>		  						  
 					</ul>
 				</li>		  			  
 			</ul>
@@ -29,14 +79,16 @@
 	</div>
 	<div class="row">
 		<div class="small-12 small-centered columns panel callout radius profile-content">
-			<dl class="tabs" data-tab>
-			  	<dd><a href="#panel2-1">Exam Input</a></dd>
-				<dd><a href="#panel2-2">Target Text</a></dd>
-				<dd><a href="#panel2-3">Discrepancies</a></dd>
-			  	<dd><a href="#panel2-4">Source Queue</a></dd>				
-			  	<dd><a href="#panel2-5">Source Disc</a></dd>
-			  	<dd><a href="#panel2-6">Grading</a></dd>			
-			</dl>
+			<div class="center-tabs">
+				<dl id="tabs" class="tabs" data-tab>
+			  		<dd><a id="exam-tab" href="#panel2-1">Exam Input</a></dd>
+					<dd><a id="target-tab" href="#panel2-2">Target Text</a></dd>
+					<dd><a id="disscrep-tag" href="#panel2-3">Discrepancies</a></dd>
+			  		<dd><a id="source-queue-tab" href="#panel2-4">Source Queue</a></dd>				
+			  		<dd><a id="source-discrep-tab" href="#panel2-5">Source Disc</a></dd>
+			  		<dd><a id="grade-tab" href="#panel2-6">Grading</a></dd>			
+				</dl>
+			</div>
 			<div class="tabs-content">
 			  	<div class="content" id="panel2-1">
 			    	<p>Exams to be inputed.</p>
@@ -87,7 +139,7 @@
 			  	
 			    	{% for examToGrade in examsToGrade %}
 
-			    	<p><a href="/grade/exam/{{ examToGrade.exam.examNumber}}/{{ examToGrade.passageLetter }}/">{{ examToGrade.exam.examNumber}}</a></>
+			    	<p><a href="/grade/exam/{{ examToGrade.exam.examNumber}}/{{ examToGrade.passageLetter }}/">{{ examToGrade.exam.examNumber}}</a></p>
 
 			    	{% endfor %}
 

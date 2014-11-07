@@ -1,3 +1,16 @@
+#=====================================================================================================
+#Description:
+#Urls for exam records
+#=====================================================================================================
+
+#Edited by: Zach Montgomery
+#Date: 10/22/14 
+#contact info: zmontgom@kent.edu
+#Changes made: commented out the verify-exam-record url. This url would be used for verifying target texts.
+#				Since we are taking the project to its simplest form, this is not needed. 
+#=====================================================================================================
+
+
 from django.conf.urls import patterns, include, url
 from records import views
 
