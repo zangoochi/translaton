@@ -1,0 +1,61 @@
+<script type="text/javascript">
+  
+
+
+
+
+
+var counter = 0;
+var maxParm = 10;
+
+function create_add() {
+
+  //Create an input type dynamically.
+  var element = document.createElement("input");
+
+  //Create Labels
+  var label = document.createElement("Label");
+
+  var delete_parm = document.createElement("delete");
+  delete_parm.innerHTML =   "<input class='button radius' style='width:40%; display: inline; height:26px' onClick='delete_parm("+counter+")'value = 'Remove' readonly>";
+  //"<input class='button radius' style='margin-right:50px'  value = 'Remove' onClick='delete_parm("+counter+")>";
+
+  delete_parm.setAttribute("id", "delete_" + counter);
+  //Assign different attributes to the element.
+  var parmid = "parm_"+counter;
+  element.setAttribute("type", "text");
+  element.setAttribute("id", "parm_"+counter);
+  element.setAttribute("value", "");
+  element.setAttribute("name", "parm");
+  element.setAttribute("style", "width:55%; display: inline; margin-right: 5px");
+
+  label.setAttribute("style", "font-weight:normal");
+
+  // 'foobar' is the div id, where new fields are to be added
+  var parms = document.getElementById("parmspan_create");
+
+  label.innerHTML = "<label id=label_" + counter  + ">Parameter " + counter +" </label>"; 
+  parms.appendChild(element);
+  parms.appendChild(delete_parm);
+
+  counter += 1;
+}
+
+</script>
+ <div class="small-8 columns">
+    <form id = "rformCreate" action="rCreate/" method="post">{% csrf_token %}
+          {{ rform }}
+      	<div class="small-8 columns" id="parmdiv" align = "left"> 
+      		<span id="parmspan_create" align = "left"> </span>
+	        <input class="button radius" style="width:100%;" onClick="create_add()"value = "Add Parameter" readonly>
+	        <br>
+	        
+
+      	</div>
+      <!-- link to add new file input box when clicked on it -->
+       
+      	<div class="small-3 columns" align = "right">
+        	<input class="button radius" style="margin-right:100px" type="submit" value="Save" name="submitSource">
+    	</div>
+    </form>
+</div>

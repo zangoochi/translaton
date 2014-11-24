@@ -1,3 +1,26 @@
+
+'''
+=====================================================================================================
+Created by: anonymus
+Date:
+Version: 1.0
+Contact info:
+Description:
+Main code for grading page. 
+It cretes side by side windows and controll butons for grading functionality
+=====================================================================================================
+
+Edited by: Vidmantas Steponavicius
+Date: 10/21/2014
+Contact info: vstepona@kent.edu
+Changes made: Added many code coments and indentation for better readibility
+					 Changed naming on some tags to better reflect the meaning and easier readibility
+
+=====================================================================================================
+'''
+
+
+
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404, render, redirect
 from texts.models import Error, GraderQueue,  Exam, Discrepancy, ErrorCode, createErrorFromPostData, ErrorJSON, editErrorFromPutData
@@ -5,14 +28,22 @@ from django.views.decorators.csrf import csrf_exempt
 from texts.utils import findDifferenceInTexts
 from django.core import serializers
 import json
-from login.filters import *
 
+
+
+
+
+# Index page rendering call
 def index(request):
     return render(request, 'grade/index.html', {})
 
+
+
+'''
 #insert an error into the database.
 #POSTDATA: examID, passageLetter, errorCode, pointsDeducted, sourceErrorStartIndex
 #		   sourceErrorEndIndex, targetErrorStartIndex, targetErrorEndIndex, comments
+'''
 def errorWithoutID(request, examNumber, passageLetter):
 	#create a new error
 	if request.method == "POST":
@@ -25,6 +56,11 @@ def errorWithoutID(request, examNumber, passageLetter):
 		exam = Exam.objects.get(examNumber = examNumber)
 		examErrors = exam.error_set.filter(passageLetter = passageLetter)
 		return HttpResponse(serializeErrorsAsJSON(examErrors), mimetype="application/json")
+
+
+
+
+
 
 def errorWithID(request, examNumber, passageLetter, errorID):
 	error = Error.objects.get(pk = errorID)
@@ -40,6 +76,9 @@ def errorWithID(request, examNumber, passageLetter, errorID):
 		editErrorFromPutData(error, putData)
 		return HttpResponse("Error Updated")
 
+
+
+
 def finalizeGrading(request, examNumber, passageLetter):
 	if request.method == "POST":
 		examToFinalize = Exam.objects.get(examNumber = examNumber)
@@ -54,6 +93,9 @@ def finalizeGrading(request, examNumber, passageLetter):
 		targetText.doneGrading = True
 		targetText.save()
 		return HttpResponse("Target Text Finalized")
+
+
+
 
 
 def insertHighlightJSON(request, examNumber, passageLetter):
@@ -76,15 +118,27 @@ def insertHighlightJSON(request, examNumber, passageLetter):
 		exam = Exam.objects.get(examNumber = examNumber)
 		return HttpResponse(serializers.serialize("json", ErrorJSON.objects.filter(exam = exam.pk, passageLetter = passageLetter)), mimetype="application/json")
 
-@is_grader
+
+
+
+
+
 def gradeExam(request, examNumber="-1", passageLetter="A"):
+
+
+	#for debuging purposes only
+	#assert False, examNumber
+
+
+
+
 	if request.method == 'POST':
 		examErrors = request.POST
 		return render(request, 'grade/temp_out.html', {'examErrors': examErrors})
 	else:
 		errorCodes = ErrorCode.objects.all()
 		if examNumber == "-1":
-			return render(request, 'grade/grade_exam.html', {'errors': errorCodes})
+			return render(request, 'grade/grade_exam.html', {'errors': errors})
 		else:
 			exam = Exam.objects.get(examNumber=examNumber)
 			examErrors = exam.error_set.all()
@@ -95,15 +149,22 @@ def gradeExam(request, examNumber="-1", passageLetter="A"):
 				sourceText = exam.sourceText2
 				targetText = exam.targetText2
 			
-			print targetText.doneGrading
+			#print targetText.doneGrading
 			return render(request, 'grade/grade_exam_mockup.html', { 'examErrors' : examErrors, 
 																	'exam'      : exam,
 																	'errorCodes': errorCodes, 
 															 		'sourceText' : sourceText, 
-														   			'targetText' : targetText})																													 
+														   			'targetText' : targetText,
+														   			'passageLetter' : passageLetter})																													 
+
+
+
+
+
 #render the discrepencys between texts
 def discrepancyReview(request, discrepancyID):
 	discrepancy = Discrepancy.objects.get(pk=discrepancyID)
+
 	#verification submitted. make sure it passed
 	if request.method == "POST":
 		#hacky workaround, sometimes the input field contains html spaces which aren't equal to the empty char
@@ -114,6 +175,7 @@ def discrepancyReview(request, discrepancyID):
 			discrepancy.numTimesVerifyied += 1
 			if discrepancy.numTimesVerifyied >= 2:
 				discrepancy.delete()
+
 		#verification failed: reset the counter
 		else:
 			discrepancy.numTimesVerifyied = 0
@@ -134,11 +196,18 @@ def discrepancyReview(request, discrepancyID):
 		return render(request, 'grade/discrepancy_review.html', {'originalText' : originalText, 
 																 'modifiedText' : formattedDiff,
 																 'discrepancyID': discrepancy.pk})
+
+
 def serializeErrorsAsJSON(errors):
 	errorObjects = [obj.as_json() for obj in errors]
 	return json.dumps(errorObjects)
 
-#return an html string of modified words where the differences are highlihgted
+
+
+
+
+
+#return html string of modified words where the differences are highlihgted
 def findDifferenceInTexts(originalText, modifiedText):
 	originalWords = originalText.split(' ')
 	modifiedWords = modifiedText.split(' ')
@@ -148,25 +217,35 @@ def findDifferenceInTexts(originalText, modifiedText):
 		if i < len(originalWords):
 			if modifiedWords[i].strip() != originalWords[i].strip():
 				modifiedWords[i] = highlightWord(modifiedWords[i], "yellow")
+
 		#checking for words that were added
 		else:
 				modifiedWords[i] = highlightWord(modifiedWords[i], "red")
 
 	return ' ' .join(modifiedWords)
 
+
+
+
 def highlightWord(word, color):
 	return '<span style="background-color:{0};">{1}</span>'.format(color, word)
 
+
+
+'''
+save highlighted source and target texts 
+'''
 def saveHighHTML(request, examNumber, passageLetter):
 	exam = Exam.objects.get(id=examNumber)
 	highHtmlObj = HighlightedHTML.objects.get(exam=exam)
-	#print highHtmlObj
+	print highHtmlObj
+	#if passage 'A'
 	if (passageLetter == "A"):
 		if (request.POST['frameId'] == "source"):
 			highHtmlObj.sourceHTML1 = request.POST['html']
 		elif (request.POST['frameId'] == "target"):
 			highHtmlObj.targetHTML1 = request.POST['html']
-	else:
+	else: #if passage is not 'B/C'
 		if (request.POST['frameId'] == "source"):
 			highHtmlObj.sourcHTML2 = request.POST['html']
 		elif (request.POST['frameId'] == "target"):

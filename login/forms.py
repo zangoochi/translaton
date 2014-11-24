@@ -8,11 +8,11 @@
 #Contact Info: zmontgom@kent.edu
 #Changes made: Added ChangeEmailForm to provide the form for a user to change his/her email address.
 
-#Date:10/29/14
+
+#Edited by: Zach Montgomery	
+#Date:10/28/14
 #Contact Info: zmontgom@kent.edu
-#Changes made: Changed CHOICES to get all groups out of the database and list them in the groups selection option. 
-#				This is needed so that if/when the admin creates a new group, that group will be automatically available
-#				as an option when the admin creates a new user
+#Changes made: Added dynamic choices instead of hard coded ones
 #=====================================================================================================
 
 
@@ -20,12 +20,15 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 
+
+#Gets list of all the groups
 groups = Group.objects.all()
 
+
+#Creates list of tuples for the group choices
 CHOICES = []
 for group in groups:
 	CHOICES.append((group,group))
-
 
 class NewUserForm(forms.Form):
     error_css_class = 'error'
@@ -49,14 +52,10 @@ class ChangeEmailForm(forms.Form):
 
 	new_email = forms.EmailField()
 	email_confirmation = forms.EmailField()
-	
-	
 
 	def clean_email_confirmation(self):
 		newEmail_cleaned = self.cleaned_data.get('new_email')
 		confirmedEmail = self.cleaned_data.get('email_confirmation')
-		print newEmail_cleaned
-		print confirmedEmail
 
 		if newEmail_cleaned != confirmedEmail:
 			raise ValidationError("Email addresses do not match!")

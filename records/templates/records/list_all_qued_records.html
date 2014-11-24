@@ -6,56 +6,7 @@
 	<h1>Lists all records that need graded</h1>
 	<div class="row panel callout radius">
 		<div class="large-12 columns">
-		<table>
-		<tr>	
-			<th>year</th>
-			<th>source language</th>
-			<th>target language</th>
-			<th>exam number</th>
-			<th>grader one</th>
-			<th>grader two</th>
-			<th>target text A</th>
-			<th>target text B/C</th>
-		</tr>	
-			
-			
-			{% for record in records %}
-			<tr>
-				<td>{{record.year}}</td>
-				<td>{{record.source_language}}</td>
-				<td>{{record.target_language}}</td>
-				<td>{{record.exam_number}}</td>
-				<td>{{record.grader_one}}</td>
-				<td>{{record.grader_two}}</td>
-				<td>{{record.target_text_a}}</td>
-				<td>{{record.target_text_b_c}}</td>
-				
-			</tr>
-			{% endfor %}
-		</table>
-		</ul>
+			<p>this more than likely will be for admins only as each grader only needs to know about exams assigned to him/her</p>
 		</div>
 	</div>
 {% endblock %}
-
-
-
-
-	year            = models.PositiveSmallIntegerField()
-	source_language = models.CharField(max_length=4)
-	target_language = models.CharField(max_length=4)
-	exam_number     = models.PositiveSmallIntegerField()
-	second_passage  = models.CharField(max_length=2)
-	a_passage_markings = models.CharField(max_length=3)
-	second_passage_markings = models.CharField(max_length=3)
-	grader_one      = models.PositiveSmallIntegerField()
-	grader_two      = models.PositiveSmallIntegerField()
-	target_text_a   = models.TextField()
-	target_text_b_c = models.TextField()
-	grader_stop_a   = models.CharField(max_length=3)
-	grader_stop_b_c = models.CharField(max_length=3)
-	incomplete_a    = models.CharField(max_length=3)
-	incomplete_b_c  = models.CharField(max_length=3)
-	global_quality_pts = models.PositiveSmallIntegerField()
-	exam_reviewed_a = models.CharField(max_length=3, default="no")
-	exam_appealed_b_c = models.CharField(max_length=3, default="no")

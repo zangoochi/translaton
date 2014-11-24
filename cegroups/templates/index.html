@@ -1,3 +1,24 @@
+<!-- 
+===================================================================================================
+Description:  index.html for the administration page .  
+===================================================================================================
+
+Edited by: Abdullah Mashabi
+Date:10/31/14
+Contact Info: amashabi@kent.edu
+Changes made: Added the groups section. (Ticket #632) 
+
+Edited by:Zach Montgomery
+Date: 11/14/14
+Contact Info: zmontgom@kent.edu
+Changes Made: First check if admin is in checking state or in project state. If checking state then set the 
+checking checkbox to be selected. If admin selects this checkbox then, set check variable to True to be used 
+throughout the pages to allow the admin to search the pages for object names and reload those variables later. 
+
+For Testing purposes, allow admin to click button to load the data onto the page
+
+================================================================================================== -->
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
@@ -8,18 +29,17 @@
   		<h1>Administration</h1>
 	</div>
 </div>
+
 <div class="row">
 	<div class="small-12 small-centered columns panel callout radius profile-content">
 		<div class="center-tabs">
-
-			<dl class="tabs" data-tab data-options="deep_linking:true;">
-				<dd><a href="#users">Users</a></dd>
-				<dd><a href="#groups">Groups</a></dd>
-				<dd><a href="#permissiontypes">Permission Types</a></dd>
-				<dd><a href="#permissionobjects">Permission Objects</a></dd>
+			<dl class="tabs" data-tab>
+				<dd><a id="admin-users" href="#users">Users</a></dd>
+				<dd><a id="admin-groups" href="#groups">Groups</a></dd>
+				<dd><a id="admin-permission-types" href="#permissiontypes">Permission Types</a></dd>
+				<dd><a id="admin-permission-objects" href="#permissionobjects">Permission Objects</a></dd>
 			</dl>
 		</div>
-
 		<div class="tabs-content">
 			<div class="content" id="users">
 				<div class="row">
@@ -28,9 +48,10 @@
 			</div>
 			<div class="content" id="groups">
 				<div class="row">
-					<p>Not implemented yet.<br>Future: Create groups; edit groups; set user membership; set group permissions for objects</p>
+					{% include "maint_groups.html" %}
 				</div>
 			</div>
+
 			<div class="content" id="permissiontypes">
 				<div class="row">
 					{% include "maint_perm_types.html" %}
@@ -38,12 +59,15 @@
 			</div>
 			<div class="content" id="permissionobjects">
 				<div class="row">
-					<p>Not implemented yet.<br>Future: Create permission objects; edit permission objects; set parent relations</p>
-				</div>
+					{% include "maint_perm_objects.html" %}
+
 			</div>
 		</div>
+
 	</div>
 </div>
-{{varname}}
-{% AdminCheck "False" as "varname" %}
 {% endblock %}
+
+
+
+<!-- =====   End of index.html  ===== -->

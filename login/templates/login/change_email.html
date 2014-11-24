@@ -1,11 +1,14 @@
 <!--
 =====================================================================================================
 Description:
-Template for a user to change his/her email address. Uses Django form ChangeEmailForm from forms.py. 
+Template for a user to change his/her password. Uses Django form ChangeEmailForm from forms.py. 
 =====================================================================================================
-Created by: Zach Montgomery
+
+Edited by: Zach Montgomery
 Date: 10/18/14
 Contact info: zmontgom@kent.edu
+Changes made: Added verify_frame_next, verify_frame, and verify_text to include styling for verifying
+				target	 
 =====================================================================================================
 -->
 
@@ -14,7 +17,7 @@ Contact info: zmontgom@kent.edu
 {% load staticfiles %}
 {% block body_block %}
 <div id="login" style="width:300px; margin: 100px auto 0 auto;">
-<form method="POST" action="/login/change-email/"> {% csrf_token %}
+<form method="POST" action="/login/change-email/" id="changeEmailForm"> {% csrf_token %}
 <fieldset>
 <legend>Change Email</legend>
 {% csrf_token %}

@@ -60,13 +60,14 @@ Changes Made: NOTE: Hitting enter submits all data fields.
 		</form>
 	</span>
 	<span class="content" id="userview">
-		<table>
+		<table id="user-view-table">
 			<tr>
 				<th>User</th>
 				<th>Group</th>
 				<th>First Name</th>
 				<th>Last Name</th>
 				<th>Email</th>
+				<th>Languages</th>
 				<th>Last Login</th>
 
 			</tr>
@@ -77,11 +78,24 @@ Changes Made: NOTE: Hitting enter submits all data fields.
 				{% if user.groups.all.first != None %}
 					<td id ='g'><div class="group" name="{{user.id}}" value="{{user.groups.all.first}}">{{user.groups.all.first}}</div></td>
 				{% else %}
+
 					<td id = 'g'><div class="group" name="{{user.id}}" value="{{user.groups.all.first}}"> </div> </td>
+
 				{% endif %}
 				<td id='f'><div class="fname" name="{{user.id}}">{{user.first_name}}</div></td>
+
 				<td id='l'><div class="lname" name="{{user.id}}">{{user.last_name}}</div></td>
+
 				<td id='e'><div class="uemail" name="{{user.id}}">{{user.email}}</div></td>
+
+				<td id='lang'><div class='ulanguages' value="{{user.languagepair_set.all.first.language}}" name="{{user.id}}">
+				<ul>
+				{% for langpair in user.languagepair_set.all %}
+					<li style="display:inline-block;">{{langpair.language.displayName}}</li>
+				{% endfor %}
+				</ul>
+				</div></td>
+
 				<td>{{user.last_login}}</td>
 				<td id='p'><div class='changePass' name="{{user.id}}"><span style='color:blue'>Change Password</span></div></td>
 			</tr>
@@ -93,7 +107,7 @@ Changes Made: NOTE: Hitting enter submits all data fields.
 
 <!-- JQuery that is used to manipulate the table so that a user can click on the certain element
 	in order to be able to change that attribute for the user. Example would be to click the users first name
-	and a form comes up to allow the admin to change the users first name.   
+	and a form comes up to allow the admin to change the users first name.
 
 	How it works: 
 
@@ -104,42 +118,63 @@ Changes Made: NOTE: Hitting enter submits all data fields.
 		does the specific actions depending on the form. -->
 
 <script type="text/javascript">
-	$('body').on('click', '#f', function(){
+
+	//Creates form to edit first name attribute of user
+	$('body').on('click', '#f', function(event){
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
 
 		var uid = $(this).children('.fname').attr('name');
 
 		$(this).children('.fname').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
-			<input name=" + uid + " placeholder='First Name'/> <button type='submit' style='float:left; padding:0px;'/><input type='hidden' name='firstSubmit'/></form>");
+			<input id='first_name' name=" + uid + " placeholder='First Name'/> <input type='hidden' name='firstSubmit'/></form>");
 
-		$(this).children('.fname').remove();
+		$('#first_name').focus();
+		$(this).children('.fname').hide();
+
+		event.stopPropagation();
 	});
 
-	$('body').on('click', '#l', function(){
+	//Edit last name attribute of user
+	$('body').on('click', '#l', function(event){
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
 
 		var uid = $(this).children('.lname').attr('name');
 
 		$(this).children('.lname').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
-			<input name=" + uid + " placeholder='Last Name'/><input type='hidden' name='lastSubmit'/></form>");
-
-		$(this).children('.lname').remove();
+			<input id='last_name' name=" + uid + " placeholder='Last Name'/><input type='hidden' name='lastSubmit'/></form>");
+		$('#last_name').focus();
+		$(this).children('.lname').hide();
+		event.stopPropagation();
 	});
 
-	$('body').on('click', '#e', function(){
+	//Edit email attribute of user
+	$('body').on('click', '#e', function(event){
+		$('table form').remove();
+		$('table div').show();
 		var uid = $(this).children('.uemail').attr('name');
 
 		$(this).children('.uemail').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
-			<input name=" + uid + " placeholder='email' /><input type='hidden' name='emailSubmit'/></form>");
-		$(this).children('.uemail').remove();
+			<input id='email' name=" + uid + " placeholder='email' /><input type='hidden' name='emailSubmit'/></form>");
+
+		$('#email').focus()
+		$(this).children('.uemail').hide();
+		event.stopPropagation();
 
 	});
 
-	$('body').on('click', '#g', function(){
+	//Creates select drop down to edit group of a user
+	$('body').on('click', '#g', function(event){
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
+
 
 		var uid = $(this).children('.group').attr('name');
 		var ugroup = $(this).children('.group').attr('value');
 
 		$(this).children('.group').after("<form id='groupForm' action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
-			<select id='select' name=" + uid + " placeholder='password'>\
+			<select id='select' name=" + uid + " >\
 			{% for group in groups %}\
 				<option value='{{group}}'>{{group}}</option>\
 			{% endfor %}\
@@ -147,21 +182,67 @@ Changes Made: NOTE: Hitting enter submits all data fields.
 			<input type='hidden' value='Submit' name='groupSubmit'/></form>");
 
 			$('#select option[value="' + ugroup + '"]').prop('selected', true);
+
+			$('#select').focus();
+
 			$('#select').change(function(){
 				this.form.submit();
-
 			});
 
-		$(this).children('.group').remove();
+		$(this).children('.group').hide();
+		event.stopPropagation();
 	});
 
-	$('body').on('click', '#p', function(){
+	//Edit a users password
+	$('body').on('click', '#p', function(event){
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
+
 		var uid = $(this).children('.changePass').attr('name');
 
 		$(this).children('.changePass').after("<form action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
-			<input name=" + uid + " type='password'/><input type='hidden' name='passSubmit'/></form>");
-		$('.changePass').remove();
+			<input id='password' name=" + uid + " type='password' placeholder='password'/><input type='hidden' name='passSubmit'/></form>");
+
+		$('#password').focus();
+		$(this).children('.changePass').hide();
+		event.stopPropagation();
 
 	});
 
+
+	//Edits user language pairs. To remove language just select the language again. If language does not exist, then it is added
+	$('body').on('click', '#lang', function(event){
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
+
+		var uid = $(this).children('.ulanguages').attr('name');
+		var userlang = $(this).children('.ulanguages').attr('value');
+		var languagepair = $(this).children('.ulanguages').attr('data');
+
+
+
+		$(this).children('.ulanguages').after("<form id='languageForm' action='/cegroups/edituseroption/' method='POST'>{% csrf_token %}\
+			<select id='languageselect' style='font-size:100%' name=" + uid + " >\
+			<option selected='selected' disabled='disabled'>Select Language</option>\
+			{% for language in languages %}\
+				<option value='{{language}}'>{{language.displayName}}</option>\
+			{% endfor %}\
+			</select>\
+			<input type='hidden' value='Submit' name='languageSubmit'/></form>");
+
+
+			$('#languageselect').change(function(){	
+				this.form.submit();
+			});
+
+		$(this).children('.ulanguages').hide();
+		event.stopPropagation();
+	});
+
+	$('.tabs-content').click(function() {
+		$('#user-view-table form').remove();
+		$('#user-view-table div').show();
+
+	});
 </script>
+

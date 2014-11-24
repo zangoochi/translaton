@@ -1,289 +1,448 @@
+<!-- 
+=====================================================================================================
+Created by: anonymus
+Date:
+Version: 1.0
+Contact info:
+Description:
+Main code for grading page. 
+It cretes side by side windows and controll butons for grading functionality
+=====================================================================================================
+
+Edited by: Vidmantas Steponavicius
+Date: 10/10/2014
+Contact info: vstepona@kent.edu
+Changes made: Added many code coments and indentation for better readibility
+					 Changed naming on some tags to better reflect the meaning and easier readibility
+
+Date: 10/10/2014
+Changes made: Removed Add Quality Points button
+=====================================================================================================
+ -->
+
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
 
 {% block body_block %}
-		<h4>Exam # {{exam.examNumber}} -- Passage {{passageLetter}}</h4>
-		<h4>{{ sourceText.sourceLanguage.language  }} -> {{  sourceText.targetLanguage.language }}</h4>
-				<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/base/jquery-ui.css" type="text/css" media="all" />
-
-		<script type="text/javascript" src="/static/js/json2.min.js"></script>
-		<script type="text/javascript" src="/static/js/rangy-core.js"></script>
-		<script type="text/javascript" src="/static/js/jquery.js"></script>
-		<script type="text/javascript" src="/static/js/fontchoose.js"></script>
-		<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 
 
-		<div class="panel callout radius " style="text-align:center">
-			
-			<div id="backbone_test"></div>
+	<!-- Display exam information: exam number, passage letter, source and taget languages on top of the page -->
+	<h4>Exam #{{exam.examNumber}} Passage {{passageLetter}}</h4>
+	<h4>Grade from {{ sourceText.sourceLanguage.displayName  }} to {{  sourceText.targetLanguage.displayName }}</h4>
 
-			<section class="side-by-side">
+
+
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/base/jquery-ui.css" type="text/css" media="all" />
+
+	<script type="text/javascript" src="/static/js/json2.min.js"></script>
+	<script type="text/javascript" src="/static/js/rangy-core.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/fontchoose.js"></script>
+	<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+
+
+
+	<!-- ====================== Create container for grading page ====================== -->
+	<div class="panel callout radius " style="text-align:center">
+		
+		<div id="backbone_test"></div>
+		<!--Display source and target text on the page-->
+		<section class="side-by-side">
 			<div>
 				<div class="float-l grade_frame" id="source_box">
 					<h3>Source Text</h3>
-						<div class="frame_text"  id="source_grading_box" name ="source">
-							{{ sourceText.text }}
-						</div>
+					<div class="frame_text"  id="source_grading_box" name ="source">
+						<!--Display source text on the page-->
+						{{ sourceText.text }}
+					</div>
 				</div>
 
 				<div class="float-l grade_frame_next" id="target_box" name="target">
 					<h3>Target Text</h3>
-						<div class="frame_text"  id="target_grading_box">
-							{{ targetText.text }}
-						</div>
+					<div class="frame_text"  id="target_grading_box">
+						<!--Display target text on the page-->
+						{{ targetText.text }}
+					</div>
 				</div>
 			</div>	
-				
+			
 			
 
-				<!--GRADE FORM BEGINS HERE-->
-				<div class="gr_funct_div" id="target">
-				
-				<br />
+			<!-- =============================================================== GRADE FORM BEGINS HERE ============================================================== -->
+			
 
+			<div class="gr_funct_div" id="target">
+				
+				<!--Slider to adjust font size in the source and target texts-->
+				<br />
 				<p align='center'>Adjust Font Size</p>
 				<div id="slider"></div>			
-							
-								<br />
-
-							<h3> Grading Functions</h3>
-							
-							<!--NEEDS LINKED TO A QUERY-->
-							<p id="totalErrorPoints">TOTAL ERROR POINTS: 0</p>
-							<br/>
-							<input type="button" id="rubric" name="rubric" value="See Grading Flowchart" onclick="return popup('/static/img/flowchart.jpg', 'Grading Flowchart')" class="button"/>&nbsp;
-   							 <input type="button" id="pdf" name="pdf" value="View PDF Scan" onclick="return popup('/static/pdf/{{ exam.getPDFURI }}/', 'PDF Scan')" class="button"/>&nbsp;
-							<br/>
-							
-						<!--MAIN CONTROL BUTTONS-->
-						<div id="control_buttons" >
-							<input type="hidden" {%if targetText.doneGrading%} style="display:none" {% endif%}id="add" name="add" value="Add Error" onclick="return showAddError();" />&nbsp;
 
 
-							 <script type="text/javascript">
-							 	$(document).ready(function(){
-							 		$('#add').load(showAddError())});
-
-							</script>
-
-
-
-							<input type="button" class="button" id="add_quality_pts" {%if targetText.doneGrading%} style="display:none" {% endif%} name="add_quality_pts" value="Add Quality Points" onclick="return showQtyPts();" />&nbsp;
-							<br/>
-							<input type="button" id="show_errors" name="show_errors" value="Show All Errors" onclick="return showCommentTable();" class="button"/>&nbsp;
-							<input type="button" id="end_grade" name="end_grade" {%if targetText.doneGrading%} style="display:none" {% endif%}value="End Grading" onClick="return confirmEnd();" class="button"/>
-						</div>
-						
-						<!--HIGHLIGHT BUTTONS-->
-						<div class="grade_div"  id="add_error">
-							<form id="add_errors_form" method="post">{% csrf_token %}
-								<br/>
-								<input type="button" id="start_high" value="Begin Highlighting" onclick="highlight_buttons();" class="button" />&nbsp;
-
-								<script type="text/javascript">
-									$('#start_high').trigger("cl");
-								</script>
-
-								<input type="button" id="end_high" value="End Highlighting" onclick="return showAddErrorMenu();" class="button" />
-								&nbsp;
-								<br/>
-								<input type="reset" id="highlight_cancel" name="end_cancel" value="Cancel" onClick="return cancel();" class="button"/>&nbsp;
-								<input type="reset" class="button" id="reset_high" value="Reset Form" onclick="return reset_highlight();"/>&nbsp;
-						</div>
-						
-						<!--MENU WITH ERROR VALUES TO ASSIGN TO THE HIGHLIGHT-->
-						<div class="grade_div"  id="add_error_menu" style="text-align:center" name="add_error_menu">
-								
-									Error Code:
-									<select required id="slct1" class="select_box" name="errorCode">
-									
-										{% for errorCode in errorCodes %}
-										<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }}</option>
-									{% endfor %}
-								
-									</select>
-									&nbsp;
-									Assign Value:
-									<select required id="slct2"  class="size_box" name="pointsDeducted">
-										<option value="1">1</option>
-										<option value="2">2</option>
-										<option value="4">4</option>
-										<option value="8">8</option>
-										<option value="16">16</option>
-									</select>
-									
-									Error Type
-									<select style="width:100px" id="errorType">
-										<option value="NORMAL_ERROR">Normal</option>
-										<option value="DISJUNCT_ERROR">Disjunct</option>
-									</select>
-
-									<br/>
-									Error Comments:
-									<input type="text"  name="comment" id="comments" class="comment" />
-									&nbsp;
-									<p class="center">
-										<input type="reset" id="add_cancel" name="end_cancel" value="Cancel" onClick="return cancel();" class="button" />
-										<input type="reset" id="add_reset" value="Reset Form" class="button" />
-										<input type="submit" name="Submit" id="add_submit" value="Submit" onClick="return false;" class="button"/>
-									</p>
-							</form>
-						</div>
-							
-							
-						<!--DELETE FORM-->
-						<div class="grade_div" id="delete_error" name="delete_error" >
-							<form id="delete_errors_form" method="post">{% csrf_token %}
-								Error Number:
-									<!-- would like to auto populate from database-->
-									<select required id="delete_error_number" class="size_box">
-									</select>
-
-									&nbsp;
-									<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
-									Error Code:
-									<select required id="delete_slct1" class="select_box" name="errorCode">
-									{% for errorCode in errorCodes %}
-										<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }}</option>
-									{% endfor %}
-							
-									</select>
-									&nbsp;
-									<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
-									Assign Value:
-									<select required id="delete_slct2" class="size_box" name="pointsDeducted">
-									</select>
-									&nbsp;
-									<br/>
-									<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
-									Error Comments:
-									<input type="text" name="comment" id="delete_comments" class="comment"/>
-									<input type="reset" id="delete_cancel" name="end_cancel" value="Cancel" onClick="return cancel()" />
-									<input type="reset" id="delete_reset" value="Reset Form" onclick="return reset_delete();"/>
-									<input type="submit" name="Submit" id="delete_submit" value="Submit" onClick="return confirmDel()" />
-								
-							</form>
-						</div>
-							
-						<!--QUALITY POINTS FORM-->
-						<div class="grade_div"  id="quality_pts" name="add_quality_points">
-							<form id="quality_points_form" method="post">{% csrf_token %}
-								<br/>
-								<input type="button" id="qty_start_high" value="Begin Highlighting" onclick="qty_highlight_buttons();" class="button"/>
-								<input type="button" id="qty_end_high" value="End Highlighting" onclick="return showQtyPtsMenu();" class="button"/>
-								<br/>
-								<input type="reset" id="qty_highlight_cancel" name="end_cancel" value="Cancel" onClick="return cancel();" class="button" />
-								<input type="reset" id="qty_reset_high" value="Reset Form" onclick="return qty_reset_highlight();" class="button"/>
-								<br/>
-								<br/>
-						</div>
-								<div class="grade_div"  id="quality_pts_menu" name="quality_pts_menu">
-								Assign Value:
-								<select required id="points"  class="size_box" >
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								</select>
-								<br>
-								<br/>
-									
-								Error Comments:
-								<input type="text"  name="comment" id="comments" />
-									<br/>
-									<p class="center">
-									<input type="reset" id="add_cancel" name="end_cancel" value="Cancel" onClick="return cancel()" />&nbsp;
-									<input type="reset" id="add_reset" value="Reset Form" />&nbsp;
-									<input type="submit" name="Submit" id="quality_submit" value="Add Quality Points" onClick="return confirmAddQty();" />&nbsp;
-									</p>
-								</div>
-							
-							</form>
-						</div>
-
-						<!--COMMENT TABLE DIV-->
-							<div class="grade_div" id="comment_table" name="comment_table" >
-								All Errors:
-								<table id="errorTable" style="margin:0 auto;">
-									<tr>
-										<th>Error #</th>
-										<th>Error Code</th>
-										<th>Comment</th>
-										<th>Source Phrase</th>
-										<th>Target Phrase</th>
-										<th>Points Deducted</th>
-										<th>Error Type</th>
-									</tr>
-								</table>
-								
-								<br />
-
-								<input type="button" id="close_table" name="add" value="Close Table" onclick="close_table();" class="button"/>
-							</div>
-
-
-				</div>				
+				<!--Grading functionality buttons-->
+				<br />
+				<h3> Grading Functions</h3>
 				
-				</section>
-			
-		</div>
-		
-		
-		<div id="myModal" class="reveal-modal" data-reveal>
-  			
-		</div>
+				
+				<!--Display current error points total - place holder-->
+				<p id="totalErrorPoints">TOTAL POINTS DEDUCTED: 0</p>
 
-		<script type="text/template" id="edit-modal-template">
-			<h2>Edit Error</h2>
 
-			<table style="margin:0 auto;">
+				<br/>
+				<!--MAIN CONTROL BUTTONS:
+							Add Error
+							Show All Errors
+							End Grading
+				-->
+				<div id="control_buttons" >
+					<input type="button" class="button" {%if targetText.doneGrading%} style="display:none" {% endif%} id="add" name="add" value="Highlight Error" onclick="return showAddError();" />&nbsp; 
+				
+
+					<br/>
+					<input type="button" id="show_errors" name="show_errors" value="Show All Errors" onclick="return showCommentTable();" class="button"/>&nbsp;
+					<input type="button" id="end_grade" name="end_grade" {%if targetText.doneGrading%} style="display:none" {% endif%}value="End Grading" onClick="return confirmEnd();" class="button"/>
+				</div>
+
+
+				<!--========================================= When Add Error is pressed ===========================================================-->
+				<!--
+				HIGHLIGHT BUTTONS:
+								Begin Highlighting
+								End Highlighting
+								Cancel
+								Reset Form
+				-->
+				<div class="grade_div"  id="add_error">
+					<form id="add_errors_form" method="post">{% csrf_token %}
+						<br/>
+						<!-- highlighting functionality is implemented in:
+						translation\translation_mockup\static\js\grade-highlight.js
+						-->
+						<input type="button" id="start_high" value="Begin Highlighting" onclick="highlight_buttons();" class="button" />&nbsp;
+
+
+						<input type="button" id="end_high" value="End Highlighting" onclick="return showAddErrorMenu();" class="button" />
+						&nbsp;
+						<br/>
+						<input type="reset" id="highlight_cancel" name="end_cancel" value="Cancel" onClick="return cancel();" class="button"/>&nbsp;
+						<input type="reset" class="button" id="reset_high" value="Reset Form" onclick="return reset_highlight();"/>&nbsp;
+					</div>
+					<!--=============================================================================================================================-->
+
+
+					<!--MENU WITH ERROR VALUES TO ASSIGN TO THE HIGHLIGHT
+						gets called when End Highliting button is pressed(see above)
+					-->
+					<div class="grade_div"  id="add_error_menu" style="text-align:center" name="add_error_menu">
+						
+						<!-- ======================================== Error code dorp down menu options ======================================== -->
+						Error Code:
+						<select required id="slct1" class="select_box" name="errorCode">
+							<!-- <option value="0" data-color="0"></option> -->
+						
+								<!-- //repapulate eror values -->
+									{% for errorCode in errorCodes %}
+										<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }} - {{errorCode.displayName}}</option>
+									{% endfor %}
+						</select>
+
+						<!-- Display current error point values -->
+						<script type="text/javascript">
+
+							$(document).ready(function()
+							{
+								populate_error_points_dropdown();
+							});
+
+							$("#slct1").change(function(){
+								populate_error_points_dropdown();}
+							);
+
+							
+
+						</script>
+						
+
+
+						<!-- ============== Assign points value dorp down menu options ============== -->
+						&nbsp;
+						<div id="slct2">
+							<p>Assign Value:
+								<select required id="slct3"  class="select_box" name="pointsDeducted">
+
+									<!-- default value and place holder for error points -->
+									<option value="{{errorCode.points}}" data-color="{{errorCode.points}}"></option>
+
+								</select> 
+							</p>
+						</div>
+
+							
+						
+						<!-- ======== Error Type dorp down menu options ======== -->
+						
+						Error Type
+						<select style="width:100px" id="errorType">
+							<option value="NORMAL_ERROR">Normal</option>
+							<option value="DISJUNCT_ERROR">Disjunct</option>
+						</select>
+
+						
+						<!-- ================= Error Comments text field =============== -->
+						<br/>
+						Error Comments:
+						<input type="text"  name="comment" id="comments" class="comment" />
+						&nbsp;
+
+
+						<!-- =========================== Add Error view buttons after Highlighting is done ================================ -->
+						<br/>
+						<p class="center">
+							<input type="reset" id="add_cancel" name="end_cancel" value="Cancel" onClick="return cancel();" class="button" />
+							<!-- <input type="reset" id="add_reset" value="Reset Form" class="button" /> -->
+							<input type="submit" name="Submit" id="add_submit" value="Submit" onClick="return false" class="button"/>
+
+						</p>
+
+					</form>
+				</div>
+				
+				
+				<!-- ========================================================== DELETE FORM ================================================== -->
+				<div class="grade_div" id="delete_error" name="delete_error" >
+					<form id="delete_errors_form" method="post">{% csrf_token %}
+						Error Number:
+						<!-- would like to auto populate from database-->
+						<select required id="delete_error_number" class="size_box">
+						</select>
+
+						&nbsp;
+						<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
+						Error Code:
+						<select required id="delete_slct1" class="select_box" name="errorCode">
+							{% for errorCode in errorCodes %}
+								<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }}</option>
+							{% endfor %}
+							
+						</select>
+						&nbsp;
+						<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
+						Assign Value:
+						<select required id="delete_slct2" class="size_box" name="pointsDeducted">
+						</select>
+						&nbsp;
+						
+						<br/>
+						<!--THIS VALUE SHOULD BE POPULATED FROM QUERY AND SHOWN JUST AS TEXT-->
+						Error Comments:
+						<input type="text" name="comment" id="delete_comments" class="comment"/>
+						<input type="reset" id="delete_cancel" name="end_cancel" value="Cancel" onClick="return cancel()" />
+						<input type="reset" id="delete_reset" value="Reset Form" onclick="return reset_delete();"/>
+						<input type="submit" name="Submit" id="delete_submit" value="Submit" onClick="return confirmDel()" />
+						
+					</form>
+				</div>
+				
+
+
+
+
+
+
+				<!--============================================== When Add Quality Points is pressed ===========================================================-->
+				<!-- =========================================================== QUALITY POINTS FORM =========================================================== -->
+				<!-- need to fugure out why it is braking highliting buttons functionality???????????????????????????????????????????????
+				HIGHLIGHT BUTTONS:
+								Begin Highlighting
+								End Highlighting
+								Cancel
+								Reset Form
+				-->
+				<div class="grade_div"  id="quality_pts" name="add_quality_points">
+					<form id="quality_points_form" method="post">{% csrf_token %}
+				</div>
+
+				<!-- ====================================================== Bonus points menu ====================================================== -->
+				<div class="grade_div"  id="quality_pts_menu" name="quality_pts_menu">
+						
+					
+				</div>
+
+
+
+
+
+
+
+
+
+				<!-- Button to display grading flow chart-->
+				<br/>
+				<input type="button" id="rubric" name="rubric" value="See Grading Flowchart" onclick="return popup('/static/img/flowchart.jpg', 'Grading Flowchart')" class="button"/>&nbsp;
+
+				<!-- Button to display PDF scan of the original exam text this can be usefull
+					 if grader wants to double check the text in student handwriting
+				-->
+				<input type="button" id="pdf" name="pdf" value="View PDF Scan" onclick="return popup('/static/pdf/{{ exam.getPDFURI }}/', 'PDF Scan')" class="button"/>&nbsp;
+				
+				</form>
+			</div>
+
+
+
+			<!-- ====================================== COMMENT TABLE DIV ====================================== -->
+			<div class="grade_div" id="comment_table" name="comment_table" >
+				<!-- ============= All errors list ============= -->
+				All Errors:
+				<table id="errorTable" style="margin:0 auto;">
+					<tr>
+						<th>Error #</th>
+						<th>Error Code</th>
+						<th>Comment</th>
+						<th>Source Phrase</th>
+						<th>Target Phrase</th>
+						<th>Points Deducted</th>
+						<th>Error Type</th>
+					</tr>
+				</table>
+				
+				<br/>
+				<!-- =========================================== Close table button =========================================== -->
+				<input type="button" id="close_table" name="add" value="Close Table" onclick="close_table();" class="button"/>
+
+			</div>
+
+
+		</div>				
+		
+	</section>
+
+	</div>
+
+
+	<div id="myModal" class="reveal-modal" data-reveal>
+		
+	</div>
+
+
+
+<!-- Edit error menu
+	can be accessed by: Show All Errors->Edit
+	using backbone for getting errors
+-->
+	<script type="text/template" id="edit-modal-template">
+		<h2>Edit Error</h2>
+
+		<table style="margin:0 auto;">
 			<tr>
-			<td>
-				<label>Error Number</label>
-				<input  id="editErrorNumber" value="<%=  model.get('errorNumber') %>"></input>
-			</td>
-			<td>	
-				<label>Error Code</label>
-				<select required id="editErrorCode" class="select_box" name="errorCode" style="width:200px;height:30px">
-									{% for errorCode in errorCodes %}
-										<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }}</option>
-									{% endfor %}			
-				</select>
-			</td>
-			<td>	
-				<label>Comment</label>
-				<input id="editErrorComment" value="<%=  model.get('comment') %>"></input>
-			</td>
-			<td>	
-				<label>Points Deducted</label>
-				<input id="editErrorPointsDeducted" value="<%=  model.get('pointsDeducted') %>"></input>
-			</td>
+				<!--Error Number field-->
+				<td>
+					<label>Error Number</label>
+					<input  id="editErrorNumber" value="<%=  model.get('errorNumber') %>"></input>
+				</td>
+	
+
+				<!--Error Code dropdown-->
+				<td>	
+					<label>Error Code</label>
+					<select required id="editErrorCode" class="select_box" name="errorCode" style="width:200px;height:30px">
+						{% for errorCode in errorCodes %}
+							<option value="{{errorCode.errorCode}}" data-color="{{errorCode.displayColor}}">{{ errorCode.errorCode }}</option>
+						{% endfor %}			
+					</select>
+				</td>
+	
+
+				<!--Comment field-->
+				<td>	
+					<label>Comment</label>
+					<input id="editErrorComment" value="<%=  model.get('comment') %>"></input>
+				</td>
+	
+	
+				<!--Points Deducted filed-->
+				<td>	
+					<label>Points Deducted</label>
+					<input id="editErrorPointsDeducted" value="<%=  model.get('pointsDeducted') %>"></input>
+				</td>
 			</tr>
-			</table>
+		</table>
+
+
+		<!--Save and Cancel Buttons-->
+		<br/>
+		<p align="center">
+			<button class="save">Save</button>
+			<button class="cancel">Cancel</button>
+		</p>
+	</script>
+
+
+	<!-- =================== Show All Errors =================== -->
+	<script type="text/template" id="error-row-template">	
+
+		<td> <%=  model.get('errorNumber') %> </td>
+		<td> <%=  model.get('errorCode') %> </td>
+		<td> <%=  model.get('comment') %> </td>
+		<td> <%=  model.get('sourcePhrase') %> </td>
+		<td> <%=  model.get('targetPhrase') %> </td>
+		<td> <%=  model.get('pointsDeducted') %> </td>
+		<td> <%=  model.get('errorType') %> </td>
+
+		//<!--Edit and Delete error buttons-->
+		{%if targetText.doneGrading == False%}
+			<td> <button class="delete">Delete</button> </td>
+			<td> <button class="edit">Edit</button> </td>
+		{% endif %}
+
+	</script>
+
+
+
+	<!-- ========================================= funtion which populates Assign Value dropdown box ========================================== -->
+	<script type="text/javascript">
+	function populate_error_points_dropdown()
+		{
+			//Get current selected Error Code value
+			var selected_err = $( "#slct1 option:selected" ).val();
+		
+			//================= get current value in the Error Code box and populate error values in the Assign Value box ====================
+			//Iterate through all available codes in order to get their points values 
+			{% for errorCode in errorCodes %}
 				
-			<br />
+				//Once matching error code is found get its points
+				if ( "{{errorCode.errorCode}}" ==  selected_err)
+				{
+					//get error points array
+					error_points_arr = null;
+					var error_points_arr = "{{errorCode.points}}".split(",");
 
-			<p align="center">
-				<button class="save">Save</button>
-				<button class="cancel">Cancel</button>
-			</p>
-		</script>
+					//Clear existing values in the dropdown menu
+					 $('#slct3>option').remove();
 
 
-		<script type="text/template" id="error-row-template">	
-				<td> <%=  model.get('errorNumber') %> </td>
-				<td> <%=  model.get('errorCode') %> </td>
-				<td> <%=  model.get('comment') %> </td>
-				<td> <%=  model.get('sourcePhrase') %> </td>
-				<td> <%=  model.get('targetPhrase') %> </td>
-				<td> <%=  model.get('pointsDeducted') %> </td>
-				<td> <%=  model.get('errorType') %> </td>
-				{%if targetText.doneGrading == False%}<td> <button class="delete">delete</button> </td>{% endif %}
-				{%if targetText.doneGrading == False%}<td> <button class="edit">edit</button> </td>{% endif %}
-		</script>
+					//Populate Assign Value box with the rest of error point values
+					for (i = 0; i < error_points_arr.length; i++) { 
+					    $('#slct3').append( '<option value="' + i  + '" data-color="' + i + '">' + error_points_arr[i] + '</option>');
+					}
+					error_points_arr = null;
+				}
+			{% endfor %}
+		};
+	</script>
+	<!-- ========================================================================================================================================= -->
 
-		<script type="text/javascript" src="/static/js/underscore.js"></script>
-		<script type="text/javascript" src="/static/js/backbone.js"></script>
-		<script type="text/javascript" src="/static/js/Hilighter.js"></script>
-		<script type="text/javascript" src="/static/js/grade-highlight.js"></script>
+
+	<script type="text/javascript" src="/static/js/underscore.js"></script>
+	<script type="text/javascript" src="/static/js/backbone.js"></script>
+
+
+	<script type="text/javascript" src="/static/js/Hilighter.js"></script>
+
+
+	<!-- ========= Higlighting buttons functionality comes fom here ========== -->
+	<script type="text/javascript" src="/static/js/grade-highlight.js"></script>
+
+
 {% endblock %}

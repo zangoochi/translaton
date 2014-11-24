@@ -1,0 +1,17 @@
+{% for rfunc in rfunctions %}
+	<br>
+	<h4 style="text-align:left"><b>{{rfunc.Name}}</b></h4>
+	<hr>
+	<div style="width:100%; margin-left:3%">
+		<div><b><u>Description</b></u><br><p style="padding-left:6%; padding-top:3px">{{ rfunc.Description }}</p></div>
+		<div><b><u>Body</b></u><br><p style="padding-left:6%; padding-top:3px">{{ rfunc.Body }}</p></div>
+		<div><b><u>Parameters</b></u><br><p style="padding-left:6%; padding-top:3px">
+			{% for rparm in rparameters %}
+				{% if rparm.RFunction_id = rfunc.id %}
+					{% if rparm.SequenceNumber > 1 %},{% endif %}
+					{{rparm.parameter}}
+				{% endif %}
+			{% endfor %}
+		</p></div>
+	</div>
+{% endfor %}

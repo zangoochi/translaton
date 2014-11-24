@@ -1,3 +1,15 @@
+#=====================================================================================================
+#Description: models.py 
+#=====================================================================================================
+#Edited by: Abdullah Mashabi
+#Date:10/23/14
+#Contact Info: amashabi@kent.edu
+#Changes made: Remove reviewing structure from creating a source text. (Ticket #593) 
+#			   When adding reviewSourceText functionality, you need to check \translation\texts\views.py
+#
+#Changes made:
+#
+#=====================================================================================================
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -15,18 +27,32 @@ class Grader(models.Model):
 	lastName = models.CharField(max_length=32)
 	language1 = models.ForeignKey(Language, related_name='+')
 	language2 = models.ForeignKey(Language, related_name='+')
-	language3 = models.ForeignKey(Language, related_name='+')
+	
 
 	def __unicode__(self):
 		return "{0} - {1}".format(self.graderID, self.lastName)
 	
+
+
+#vstepona 10 30 2014
+#added points column. its purpose is to store error point values
 class ErrorCode(models.Model):
 	errorCode = models.CharField(max_length=3)
 	displayName = models.CharField(max_length=250)
 	displayColor = models.CharField(max_length=25)
+	points = models.CommaSeparatedIntegerField(max_length=60)
+
+	#10/26 vstepona
+	#look for error point values in errorpoins table
+		#errorPoint = models.ForeignKey(ErrorPoint, related_name='+')
+	#errorValues = models.ForeignKey(ErrorPoint, related_name='+')
 	
 	def __unicode__(self):
 		return self.displayName
+
+
+
+
 	
 class Error(models.Model):
 	NORMAL_ERROR = "NORMAL_ERROR"
@@ -145,7 +171,14 @@ class sourceQueueManager(models.Manager):
 		userLangs = LanguagePair.objects.filter(user = user).values('language')
 		return self.filter(source__importer2 = None,
 						   source__sourceLanguage__in = userLangs).exclude(source__importer1 = user)
-
+					   
+						   
+#====================================
+# reviewSourceText is commented out. 
+#====================================
+#class sourceReviewQueue(models.Model):
+#	source = models.OneToOneField(SourceText)
+#	objects = sourceQueueManager()
 class sourceReviewQueue(models.Model):
 	source = models.OneToOneField(SourceText)
 	objects = sourceQueueManager()
@@ -229,8 +262,6 @@ class TargetText(models.Model):
 	
 	def isLocked():
 		return importer1 is not None and importer2 is not None
-
-
 		
 	def __unicode__(self):
 		return "TARGET TEXT {0} {1}".format(self.pk, self.pdfURI)
@@ -243,8 +274,8 @@ class Exam(models.Model):
 	secondPassageMarkings = models.BooleanField()
 	grader1 = models.PositiveSmallIntegerField()
 	grader2 = models.PositiveSmallIntegerField()
-	grader3 = models.PositiveSmallIntegerField()
-	grader4 = models.PositiveSmallIntegerField()
+	grader3 = models.PositiveSmallIntegerField(null=True, blank=True)
+	grader4 = models.PositiveSmallIntegerField(null=True, blank=True)
 	sourceText1 = models.ForeignKey(SourceText, related_name='+')
 	sourceText2 = models.ForeignKey(SourceText, related_name='+')
 	targetText1 = models.ForeignKey(TargetText, related_name='+', null=True)
@@ -259,7 +290,7 @@ class Exam(models.Model):
 		return "EXAM # {0}".format(self.examNumber)
 	
 class GraderQueue(models.Model):
-	exam = models.ForeignKey("Exam")
+	exam = models.ForeignKey("Exam", related_name='+')
 	passageLetter = models.CharField(max_length = 1)
 
 class TargetReviewQueue(models.Model):
@@ -295,11 +326,12 @@ def removeExamFromGraderQueue(exam):
 	queueObject.delete()	
 
 def addTargetTextToInputQueue(exam, targetTextNumber):
-	queueObject = TargetInputQueue(exam = Exam.objects.get(pk = exam.pk), targetTextNumber = targetTextNumber)
+	queueObject = TargetInputQueue(exam       = Exam.objects.get(pk = exam.pk            ), 
+								   targetTextNumber = targetTextNumber                   )
 	queueObject.save()
 
 def removeTargetTextFromInputQueue(exam, targetTextNumber):
-	queueObject = TargetInputQueue.objects.get(exam = exam.pk, targetTextNumber = targetTextNumber)
+	queueObject = TargetInputQueue.objects.get(exam     = exam.pk, targetTextNumber = targetTextNumber)
 	queueObject.delete()
 
 def addTargetTextToReviewQueue(targetText, exam):

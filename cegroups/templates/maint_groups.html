@@ -1,0 +1,335 @@
+<!-- 
+===================================================================================================
+Description:  maint_groups.html for groups section in the admin page .  
+===================================================================================================
+
+Created by: Abdullah Mashabi
+Date:10/31/14
+Contact Info: amashabi@kent.edu
+1st Changes made: Created the entire page for groups section.
+			        Added the needed functionalities for the html page to allow the admin to:
+			        view, create, edit, and remove groups in the admin page. 
+			        (Ticket #632)
+
+Editied by: Abdullah Mashabi
+Date:11/09/14
+Contact Info: amashabi@kent.edu
+2nd Changes made: Created a page to set group permissions based on the objects permissions. 
+				  (Ticket #651) 
+
+Editied by: Zach Montgomery
+Date:11/19/14
+Contact Info: zmontgom@kent.edu
+Changes made: Added a checkbox under set group permissions that when clicked takes you to homepage and disables all submit buttons and allows the administrator to click on any button and get the object id for that button. Then when they are finished they are returned to this page where they can then hit the button called "Select Objects" where the form is then filled out for all the objects grabbed in the previous steps. If there are no objects, the form displays a message saying to check the checkbox to find objects. (around line 130-180)				  
+
+
+================================================================================================== -->
+
+
+	<!-- ***********************************************************************
+		Page Header
+	*********************************************************************** -->
+	<dl id="maintGroupsMenu" data-tab>
+		<dd>
+			<a id="btnViewEditGroup" href="#viewEditGroup">
+				<button type="button" class="small">View/Edit</button></a>
+			<a id="btnCreateGroup" href="#createGroup">
+				<button type="button" class="small">Create</button></a>
+			<a id="btnDeleteGroup" href="#deleteGroup">
+				<button type="button" class="small">Delete</button></a>
+			<a id="btnGroupPermissions" href="#GroupPermissions">
+				<button type="button" class="small">Group Permissions</button></a>
+			<dl class="sub-nav">
+		</dd>
+	</dl>
+	<!-- *********************************************************************** -->
+
+	<!-- =======================================
+		createGroup Header
+	======================================== -->
+	<span class="tabs-content">
+	<span class="content" id="createGroup">
+		<form action="savegroupoption/" method="POST" >
+			{% csrf_token %}
+
+			<!-- New group entry -->
+			<table id="GroupDescription">
+				<tr>
+					<td>
+						<!-- <span> is for the tooltip</span> -->
+						<span data-tooltip aria-haspopup="true" class="has-tip" title="New group entry">New Group:</span>
+					</td>
+					<td>
+						<input id="name" name="name"  placeholder="Enter here.."/>
+					</td>
+				</tr>
+			</table>
+
+			<button type="submit" class="small" value="Submit" >Submit</button>
+		</form>
+	</span>
+
+	<!-- =======================================
+		deleteGroup Header
+	======================================== -->
+	<span class="content" id="deleteGroup">
+		<form action="removegroupoption/" method="POST">
+			{% csrf_token %}
+
+			<!-- Table to view the groups' names to be deleted if checked -->
+			<table>
+				<tr>
+					<th>Delete</th>
+					<th>Groups Names</th>
+				</tr>
+
+				{% for group in groups %}
+				<tr>
+					<td>
+						<input style="float:left; margin:0 auto; width:100%" type="checkbox" name="grouptodelete" value="{{group.id}}" />
+					</td>
+					<td>
+						{{group.name}}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+
+			<!-- This is a warning alert -->
+			<div data-alert class="alert-box warning round">
+ 			 Warning: Before deleting any group, It is highly recommended checking that there is no user connected to it.
+  			<a href="#" class="close">&times;</a>
+			</div>
+
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+
+	<!-- ***********************************************************************
+		Sub-Header for the Group Permissions.
+	*********************************************************************** -->
+	<span class="content" id="GroupPermissions">
+	<dl id="groupPermissions" data-tab >
+		<dd class="small stack-for-small round secondary button-group">
+
+			<!-- 1st button to View Group Permissions-->	
+			<a id="btnviewSetGroup" href="#viewSetGroup">
+				<button type="button" class="small">View Group Permissions</button></a> 
+
+			<!-- 2nd button to Set Group Permissions-->
+			<a id="btnsetGroup" href="#setGroup">
+				<button type="button" class="small">Set Group Permissions</button></a> 
+
+		</dd>
+	</dl>
+	</span>
+	<!-- *********************************************************************** -->
+
+	<!-- =======================================
+		setGroup Header
+	======================================== -->
+	<span class="content" id="setGroup">
+		
+		<!-- Reveal Modals begin -->
+		<div id="firstModal" class="reveal-modal large" data-reveal>
+			<h2>Group Permissions</h2>
+			<p class="lead">Find permission objects to set group permissions</p>
+			<p>Find permission objects works ......................</p>
+			<p><a href="#" data-reveal-id="secondModal" class="secondary button">View Documentation..</a></p>
+			<a class="close-reveal-modal">&#215;</a>
+		</div>
+
+		<div id="secondModal" class="reveal-modal large" data-reveal>
+			<h2>Object Detection for Group Object Documentation</h2>
+			<div class="widescreen" style="display: block;">
+				<iframe width="1280" height="720" src="/static/pdf/ObjectDetection.pdf" frameborder="50" allowfullscreen="" data-src="/static/pdf/ObjectDetection.pdf"></iframe>
+			</div>
+			<a class="close-reveal-modal">&#215;</a>
+		</div>
+		<!-- Reveal Modals end -->
+
+		<input id="find-object" type="checkbox" value="Find Object Name"><label for="check">Find Permission Objects.
+		<a data-reveal-id="firstModal">(How it works!)</a></label> 
+		<input id="input-selected" type="button" value="Select Objects"/><span id="objectNull"></span>
+
+		<script type="text/javascript">
+
+		</script>		
+
+		 <script type="text/javascript">
+
+			$(document).ready(function(){
+				if(get_check() == "True"){
+					$('#find-object').prop('checked', true);
+				}
+			})
+
+			$('#find-object').change(function(){
+
+				var checked = $(this).is(':checked');
+				if(checked){
+					clear_object();
+					set_check("True");
+					window.location.href = "/";
+				}
+				else{
+					set_check("False");
+					set_object(null);
+					location.reload();
+				}
+			});
+
+			$('#input-selected').click(function(){
+				var boxes = $('.permObjects').map(function() { return this; }).get();	
+				var objects = get_object();	
+
+				if(objects == null){
+					$('#objectNull').html('<div data-alert class="alert-box warning round">There are no objects to be selected. Please select the Find Permission Objects above to find objects<a href="#" class="close">&times;</a></div>');
+				}
+
+				for(var i=0; i<boxes.length; ++i){
+					var box = boxes[i];
+					for(var j=0; j<objects.length; ++j){
+						if(box.value == objects[j]){
+							$(box).attr('checked', true);
+						}
+					}
+				}
+			});
+
+		</script>
+
+		<form id="myForm" action="savegrouppermission/" method="POST">
+			{% csrf_token %}
+			
+			<!-- 1st table in the (Set Group Permissions) to view the group names-->
+			<table style="display: inline-table;">
+				<tr>
+					<th>Select</th>
+					<th>Groups Names</th>
+				</tr>
+
+				{% for group in groups %}
+				<tr>
+					<td>
+						<input style="float:left; margin:0 auto; width:100%" type="radio" 
+						name="{{group.name}}" value="{{group.name}}" />
+					</td>
+					<td>
+						{{group.name}}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+
+			<!-- 2nd table in the (Set Group Permissions) to view the permissions objects-->
+			<table style="display: inline-table;">
+				<tr>
+					<th>Select</th>
+					<th>Set Group Permissions</th>
+				</tr>
+
+				{% for permObject in permObjects %}
+				<tr>
+					<td>
+						<input style="float:right; margin:0 auto; width:100%" class="permObjects" type="checkbox" 
+						name="{{permObject.id}}" value="{{permObject.objectName}}"/>
+					</td>
+					<td>
+						{{permObject.objectName}}
+					</td>
+				</tr>
+				{% endfor %}
+
+			</table>	
+
+			<!-- myFunction() jQuery is used to make the two tables submit in one button. -->
+			<button style="display: list-item;" onclick="myFunction()" type="submit" class="button expand" name="setpermgroup" value="Submit">Submit</button>
+		</form>
+	</span>
+
+	<!-- =======================================
+		viewSetGroup Header
+	======================================== -->
+	<span class="content" id="viewSetGroup">
+			{% csrf_token %}
+			
+			<!-- 1st table in the (View Group Permissions) to view the Permissions Objects -->
+				<table>
+					<tr>
+						<th>Groups</th>
+						<th>Permissions</th>
+					</tr>
+
+					{% for group in groups %}
+					<tr>
+						<td>
+							{{group}}
+						</td>
+						<td>
+						{% for perm in groupPermissions %}
+							{% if group.id == perm.groupId_id %}
+								{{perm.permObject.objectName}}<br/>
+							{% endif %}
+						{% endfor %}
+						</td>					
+						</tr>
+					{% endfor %}
+				</table>
+	</span>
+
+	<!-- =======================================
+		viewEditGroup Header
+	======================================== -->
+	<span class="content" id="viewEditGroup">
+
+		<!-- This box in the top of the table to inform the admin how to edit-->
+		<div data-alert class="alert-box secondary round">
+			To edit: click on the group name and then press enter. 
+			<a href="#" class="close">&times;</a>
+		</div>
+
+		<!--Table to view the existing groups' names. 
+		Also Edit them as needed by using the jQuery below -->
+		<table>
+			<tr>
+				<th>
+					Groups Names
+				</th>
+			</tr>	
+
+			{% for group in groups %}		
+			<tr>
+				<td id='grp'>
+					<div class="gname" name="{{group.id}}">{{group.name}} </div>
+				</td>
+			</tr>
+			{% endfor %}
+
+		</table>
+	</span>
+</span>
+
+
+	<!-- ****** jQuery is used for the view and edit functions in the viewEditGroup.  ***** -->
+<script type="text/javascript">
+	$('body').on('click', '#grp', function(){
+
+		var uid = $(this).children('.gname').attr('name');
+
+		$(this).children('.gname').after("<form action='/cegroups/editgroupoption/' method='POST'>{% csrf_token %}\
+			<input name=" + uid + " placeholder='Edit group name here..'/> <input type='hidden' name='groupname'/></form>");
+
+		$(this).children('.gname').remove();
+	});
+
+	// ****** jQuery is used to make the two tables submit in one button.  *****
+	function myFunction() {
+	    document.getElementById("myForm").submit();
+}
+
+</script>
+	<!-- ****** End of jQuery ***** -->
+
+
+<!-- ==== End of maint_groups.html ==== -->

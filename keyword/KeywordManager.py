@@ -3,7 +3,7 @@ from texts.models import TargetText, SourceText
 from sets import Set
 
 class KeywordManager:
-	_connection = redis.StrictRedis(host='localhost', port=8080)
+	_connection = redis.StrictRedis(host='localhost', port=6379)
 
 	#add the document (aka sourcetext / target text) to the keyword
 	def addDocumentToKeyword(self, document, keywords):

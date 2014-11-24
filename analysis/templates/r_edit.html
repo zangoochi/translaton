@@ -1,0 +1,172 @@
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+    $('#rform').hide(); //Initially form wil be hidden.
+    document.getElementById('r_function').selectedIndex = -1;
+  });
+
+
+
+function getFunctionData(){//Form shows on button click
+
+    oFormObject = document.forms['rform'];
+      request_url = 'getFunctionData';
+          $.ajax({
+              method: "get",
+              url: request_url,
+              data: "value=" +  $("#r_function").val(),
+              dataType: "text", 
+               beforeSend: function(x) {
+                if(x && x.overrideMimeType) {
+                 x.overrideMimeType("application/j-son;charset=UTF-8");
+                }
+               },
+            success: function(data) {
+                $('#rform').show();
+                var _len = data.length;
+                var post, i;
+
+                //alert(JSON.stringify(data))
+                var json = JSON.parse(data);
+                $(json).each(function(i,val){
+                    $.each(val,function(k,v){
+                          if(k == "fields")
+                              $(v).each(function(i,val){
+                                $.each(val,function(k,v){
+
+                                    oFormObject.elements[k].value = v;  
+                                });
+                              });  
+                          if(k == "pk"){
+                            //alert(k+" : "+ v); 
+                            oFormObject.elements["id"].value = v;
+                          }  
+                    });
+                });
+            },
+            failure: function(response){
+              alert("failure");
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+              alert(xhr.status);
+              alert(thrownError);
+            }
+           });
+        getParmData();
+}
+
+function getParmData(){//Form shows on button click
+  //alert("parms")
+      request_url = 'getFunctionParms';
+          $.ajax({
+              method: "get",
+              url: request_url,
+              data: "value=" +  $("#r_function").val(),
+              dataType: "text", 
+               beforeSend: function(x) {
+                if(x && x.overrideMimeType) {
+                 x.overrideMimeType("application/j-son;charset=UTF-8");
+                }
+               },
+            success: function(parms) {
+
+                var _len = parms.length;
+                var post, i;
+
+                //alert(JSON.stringify(parms))
+                var json = JSON.parse(parms);
+                $(json).each(function(i,val){
+                    $.each(val,function(k,v){
+                      if(k == "fields")
+                        $(v).each(function(i,val){
+                          $.each(val,function(k,v){
+                              if(k == "parameter"){
+                                //alert(v);
+                                add(v);
+                            }
+                          });
+                        });    
+                    });
+                });
+            },
+            failure: function(response){
+              alert("failure");
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+              alert(xhr.status);
+              alert(thrownError);
+            0}
+           });
+}
+
+var counter = 1;
+var maxParm = 10;
+
+function add(value) {
+
+  //Create an input type dynamically.
+  var element = document.createElement("input");
+
+  //Create Labels
+  var label = document.createElement("Label");
+
+  var delete_parm = document.createElement("delete");
+  delete_parm.innerHTML =   "<input class='button radius' style='width:40%; display: inline; height:26px' onClick='delete_parm("+counter+")'value = 'Remove' readonly>";
+  //"<input class='button radius' style='margin-right:50px'  value = 'Remove' onClick='delete_parm("+counter+")>";
+
+  delete_parm.setAttribute("id", "delete_" + counter);
+  //Assign different attributes to the element.
+  element.setAttribute("type", "text");
+  element.setAttribute("id", "parm_" + counter);
+  if(value)
+    element.setAttribute("value", value);
+  element.setAttribute("name", "parm");
+  element.setAttribute("style", "width:55%; display: inline; margin-right: 5px");
+
+  label.setAttribute("style", "font-weight:normal");
+
+  // 'foobar' is the div id, where new fields are to be added
+  var parms = document.getElementById("parmspan");
+
+  label.innerHTML = "<label id=label_" + counter  + ">Parameter " + counter +" </label>"; 
+  parms.appendChild(element);
+  parms.appendChild(delete_parm);
+
+  counter += 1;
+}
+
+function delete_parm(i)
+{
+    $("#parm_"+i).remove();
+    $("#label_"+i).remove();
+    $("#delete_"+i).remove();
+
+}
+
+
+ </script>
+        <div class="small-3 columns">
+          <label for="RFunction" style="cursor: default">R Function</label>
+            <select id="r_function" onchange="getFunctionData()">
+                {% for function in rfunctions %}
+                  <option value="{{ function.id }}">{{ function.Name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="small-8 columns">
+      <form id = "rform" action="rEdit/" method="post">{% csrf_token %}
+          {{ rform }}
+      <div class="small-8 columns" id="parmdiv" align = "left"> 
+
+        <span id="parmspan" align = "left"> </span>
+        <input class="button radius" style="width:100%;" onClick="add()"value = "Add Parameter" readonly>
+        <br>
+
+      </div>
+      <!-- link to add new file input box when clicked on it -->
+       
+      <div class="small-3 columns" align = "right">
+            <input class="button radius" style="margin-right:100px" type="submit" value="Save" name="submitSource">
+      </div>
+      </form>
+      </div>

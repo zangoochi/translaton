@@ -1,78 +1,115 @@
+<!-- 
+===================================================================================================
+Description: new_source_review_form.html
+===================================================================================================
+
+Edited by:    Abdullah Mashabi
+Date:         10/13/14
+Contact Info: amashabi@kent.edu
+Changes made: Add the needed functionalities in the new source entry page. (Ticket #546)
+
+
+================================================================================================== -->
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
 
 {% block body_block %}
+
     <h1>Enter New Source</h1>
     <div class="row panel callout radius">
         <div class="large-12 columns new-source-entry">
-                <form action="/texts/enter-new-source/" method="post" id="examForm">
-
-		{% csrf_token %}
-
+                <form action="/texts/enter-new-source/" method="post">
+				{% csrf_token %}
+				
                     <div class="row">
+						
+						<!-- Year input -->
                         <div class="large-2 columns">
-                            <label for="year">Year</label>
+                            <span data-tooltip aria-haspopup="true" class="tip-left" title="Year input must be four-digit integer">
+							<label for="year">Year<font color="red">*</font></label></span>
                             {{form.year}}
                             
                             {% for error in form.year.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
                         </div>
+						
+						<!-- Source Language drop-down list -->
                         <div class="large-2 columns">
-                            <label for="sourceLanguage">Source Language</label>
+                            <label for="sourceLanguage">Source Language <font color="red">*</font></label>
                             {{form.sourceLanguage}}
 
                             {% for error in form.sourceLanguage.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
                         </div>
+						
+						<!-- Target Language drop-down list -->
                         <div class="large-2 columns">
-                            <label for="targetLanguage">Target Language</label>
+                            <label for="targetLanguage">Target Language <font color="red">*</font></label>
                             {{ form.targetLanguage}}
 
                             {% for error in form.targetLanguage.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
                         </div>
+						
+						<!-- Set Number input -->
                         <div class="large-2 columns">
-                            <label for="setNumber">Set Number</label>
-				{{form.setNumber}}
-
+						<span data-tooltip aria-haspopup="true" class="tip-left" title="Set Number is a single-digit integer between 1-5">
+						<label for="setNumber">Set Number <font color="red">*</font></label></span>
+						{{form.setNumber}}
+						
                             {% for error in form.setNumber.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
                         </div>
+						
+						<!-- Passage Letter drop-down list -->
                         <div class="large-2 columns">
-                            <label for="passageLetter">Passage Letter</label>
+                            <label for="passageLetter">Passage Letter <font color="red">*</font></label>
                             {{form.passageLetter}}
 
                             {% for error in form.passageLetter.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
                         </div>
+						
+						<!-- Version Number input -->
                         <div class="large-2 columns">
-                            <label for="versionNumber">Version Number</label>
-                            {{form.versionNumber}}
-
+							<span data-tooltip aria-haspopup="true" class="tip-left" title="Version Number is normally 1 unless changes are made">
+							<label for="setNumber">Version Number <font color="red">*</font></label></span>
+						{{form.versionNumber}}
+                            
                             {% for error in form.versionNumber.errors %}
+							
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}
-                        </div>                                              
+                        </div>  
+						
                     </div>
+					
+					<!-- Source Passage Input -->
                     <div class="row"> 
                         <div class="large-12 columns">
-                            <label for="sourcePassage">Source Passage Input</label>
-                            <textarea style="height:650px" id="sourcePassage" name="sourcePassage"></textarea>  
+                            <label for="sourcePassage">Source Passage Input <font color="red">*</font></label>
+							{{form.sourcePassage}}
+							
                             {% for error in form.sourcePassage.errors %}
                                 <small class="error">{{  error  }}</small>
                             {% endfor %}    
                         </div>
                     </div>
-
-                    <input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource" onclick="document.getElementById('examForm').submit();">
-                    <input class="button radius" type="reset"  name="reset">
+					
+					<!-- Submit & Reset buttons -->
+                    <input class="button radius" style="margin-right:100px" type="submit" value="Submit Source" name="submitSource">
+					<input class="button secondary success alert" type="reset"  value="Reset" name="reset">
+					
                 </form>
         </div>
     </div>
 {% endblock %}
+
+	
+<!-- End of new_source_review_form.html -->

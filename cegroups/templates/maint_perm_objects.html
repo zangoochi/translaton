@@ -1,5 +1,70 @@
-<ul>
-	{% for permbject in permobjects %}
-		<li>{{permbject.objectName}}</li>
-	{% endfor %}
-</ul>
+<dl id="maintPermObjectsMenu" data-tab>
+	<dd>
+		<a id="btnViewPermObject" href="#poview"><button type="button" class="small">View</button></a>
+		<a id="btnCreatePermObject" href="#pocreate"><button type="button" class="small">Create</button></a>
+		<a id="btnEditPermObject" href="#poedit"><button type="button" class="small">Edit</button></a>
+		<a id="btnDeletePermObject" href="#podelete"><button type="button" class="small">Delete</button></a>
+	</dd>
+</dl>
+<span class="tabs-content">
+	<span class="content" id="pocreate">
+		<form action="savepermobject/" method="POST">
+			{% csrf_token %}
+			<table id="txtPermissionObjectName">
+				<tr>
+					<td>New Permission Object:</td>
+					<td><input id="objectName" name="objectName" /></td>
+				</tr>
+			</table>
+
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="poedit">
+		<form action="savepermobject/" method="POST">
+			{% csrf_token %}
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Object Name</th>
+				</tr>
+				{% for permobject in permobjects %}
+				<tr>
+					<td>{{permobject.id}}</td>
+					<td><input id="{{permobject.id}}" name="{{permobject.id}}" value="{{permobject.objectName}}" /></td>
+				</tr>
+				{% endfor %}
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="podelete">
+		<form action="removepermissionobject/" method="POST">
+			{% csrf_token %}
+			<table>
+				<tr><th>Delete</th><th>Object Name</th></tr>
+				{% for permobject in permobjects %}
+				<tr>
+					<td><input style="float:left; margin:0 auto; width:100%" type="checkbox" name="todelete" value="{{permobject.id}}" /></span></td>
+					<td>{{permobject.objectName}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<button type="submit" class="small" value="Submit">Submit</button>
+		</form>
+	</span>
+	<span class="content" id="poview">
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Object Name</th>
+			</tr>
+			{% for permobject in permobjects %}
+			<tr>
+				<td>{{permobject.id}}</td>
+				<td>{{permobject.objectName}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</span>
+</span>

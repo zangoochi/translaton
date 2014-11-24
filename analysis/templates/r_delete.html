@@ -1,0 +1,14 @@
+<form action="rDeletion/" method="POST">
+{% csrf_token %}
+<table style="width:100%">
+	<tr><th>Delete</th><th>Name</th><th>Description</th></tr>
+	{% for rfunc in rfunctions %}
+	<tr>
+		<td width="10%"><input style="float:left; margin:0 auto; width:100%" type="checkbox" name="todelete" value="{{rfunc.id}}" /></span></td>
+		<td width="20%">{{rfunc.Name}}</td>
+		<td width="50%">{{rfunc.Description}}</td>
+	</tr>
+	{% endfor %}
+</table>
+<button type="submit" class="small" value="Submit">Submit</button>
+</form>

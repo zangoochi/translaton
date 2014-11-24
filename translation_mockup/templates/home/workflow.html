@@ -36,14 +36,21 @@ Changes made: Added names for single elements so that we can run permission chec
 	__id: exam-tab_____id: target-tab___id: discrep-tab____id: source-queue-tab____id: source-discrep-tab____id: grade-tab___
    |                 |                |                  |                      |                          |                 |
    |   Exam Input    |  Target Text   |   Discrepencies  |      Source Queue    |      Source Discrep      |     Grading     |
-   |_________________|________________|__________________|______________________|__________________________|_________________|
+   |_________________|________________|__________________|______________________|__________________________|_________________|		
+
+   
+Edited by: Abdullah Mashabi
+Date:10/23/14
+Contact Info: amashabi@kent.edu
+Changes made: Remove unnecessary reviewing functionality for workflow page. (Ticket #607)  
 
 
-=====================================================================================================
 Edited by: Zach Montgomery
-Date: 10/28/14
-Contact info: zmontgom@kent.edu
-Changes made: Added jquery function to traverse object permissions based off of user group permissions  			    						
+Date:10/28/14
+Contact Info: zmontgom@kent.edu
+Changes Made: Added JQuery functionality to gather objects based off of group permissions
+		to allow the web page to dynamically be loaded only with the objects 
+		available for that particular user			   
 -->
 
 
@@ -53,6 +60,8 @@ Changes made: Added jquery function to traverse object permissions based off of 
 {% load staticfiles %}
 
 {% block body_block %}
+
+<!--When adding reviewSourceText functionality, the below <style> needs to be removed-->
 
 	<div class="row" style="margin-top:50px">
 		<div class="small-12 columns t-center">
@@ -71,22 +80,26 @@ Changes made: Added jquery function to traverse object permissions based off of 
 			  	<li><a id="analysis-drop-down" href="#" data-dropdown="drop3" class="button small dropdown">Analysis</a><br>
 					<ul id="drop3" data-dropdown-content class="f-dropdown">
 			  			<li><a id="analysis-page" href="/analysis/">Analysis Workflow Page</a></li>
-			  			<li><a id="view-graded" href="/analysis/gradedExams">View Graded Exams</a></li>		  						  
+			  			<li><a id="view-graded" href="/analysis/gradedExams">View Graded Exams</a></li>	
+	  					<li><a id="analysis-designer" href="/analysis/rDesigner">R Function Designer</a></li>	  
 					</ul>
-				</li>		  			  
+				</li>			  			  
 			</ul>
 		</div>
 	</div>
+	
 	<div class="row">
+	
 		<div class="small-12 small-centered columns panel callout radius profile-content">
+			<!-- commenting out the 3 pages below to remove reviewing structure -->
 			<div class="center-tabs">
 				<dl id="tabs" class="tabs" data-tab>
 			  		<dd><a id="exam-tab" href="#panel2-1">Exam Input</a></dd>
-					<dd><a id="target-tab" href="#panel2-2">Target Text</a></dd>
-					<dd><a id="disscrep-tag" href="#panel2-3">Discrepancies</a></dd>
-			  		<dd><a id="source-queue-tab" href="#panel2-4">Source Queue</a></dd>				
-			  		<dd><a id="source-discrep-tab" href="#panel2-5">Source Disc</a></dd>
-			  		<dd><a id="grade-tab" href="#panel2-6">Grading</a></dd>			
+					<!-- 1- <dd id="target-tab"><a href="#panel2-2">Target Text</a></dd> -->
+					<dd><a id="grade-tab" href="#panel2-6">Grading</a></dd>
+					<dd><a id="disscrep-tab" href="#panel2-3">Discrepancies</a></dd>
+			  		<!-- 2- <dd id="source-queue-tab"><a href="#panel2-4">Source Queue</a></dd> -->				
+			  		<!-- 3- <dd id="source-discrep-tab"><a href="#panel2-5">Source Disc</a></dd> -->			
 				</dl>
 			</div>
 			<div class="tabs-content">
@@ -136,16 +149,36 @@ Changes made: Added jquery function to traverse object permissions based off of 
 			  	</div>
 			  	<div class="content" id="panel2-6">
 			    	<p>Exams to be highlighted/Graded.</p>
-			  	
+			    	<p align="center">
+			    	<table style="margin-left: initial; margin-right: initial;">
+
 			    	{% for examToGrade in examsToGrade %}
+			  		<tr>
+						<td>Exam # {{ examToGrade.exam.examNumber  }} </td>
+						<td><a href="/grade/exam/{{ examToGrade.exam.examNumber}}/{{ examToGrade.passageLetter }}/">{% if examToGrade.targetTextNumber == 1 %}  A {% else %} {{ examToGrade.exam.secondPassage  }}  {% endif %}</a></td>
+			  		<tr/>
+			  		{% endfor %}
 
-			    	<p><a href="/grade/exam/{{ examToGrade.exam.examNumber}}/{{ examToGrade.passageLetter }}/">{{ examToGrade.exam.examNumber}}</a></p>
-
-			    	{% endfor %}
+			  		</table>
+			  		</p>
 
 			  	</div>
 			</div>
 		</div>
 	</div>
 
+
+
+<!-- Example JQuery that hides certain parts of the workflow page. 
+
+	<script type="text/javascript">
+	    {% for object in userObjects %}
+	    var name = '#' + '{{object.permObject.objectName}}';
+		$(name).remove();
+	    {% endfor %}
+
+ls
+
+	</script>
+-->
 {% endblock %}

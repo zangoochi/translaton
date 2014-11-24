@@ -1,19 +1,43 @@
+<!-- 
+===================================================================================================
+Description: list_all_source_texts.html
+===================================================================================================
+
+Edited by: Abdullah Mashabi
+Date:		11/21/14
+Contact Info: amashabi@kent.edu
+Changes made: Add the needed functionality to allow the admin view and save the edited source texts. 
+				(Ticket #711) and  (Ticket #710)
+
+
+================================================================================================== -->
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
 
 {% block body_block %}
-	<h1>This will display a list of all source texts combinations</h1>
+	<h1>List of all source texts combinations</h1>
+
 	<div class="row panel callout radius">
 		<div class="large-12 columns new-source-entry">
-			<p>Here will be a list of all source text exam combinations.</p>
-			<ul>
-			
-			{% for text in sourceTexts %}
-				<li>Source Text{{forloop.counter}}: <a href="/side-by-side/source-text/{{text.id}}">{{text}}</a>
-			{% endfor %}
-			</ul>
-			
+
+			<div class="content"
+			<p>List of all source text exam combinations.</p>
+
+			<p align="center">
+				<table style="margin-left: initial; margin-right: initial;">
+					{% for text in sourceTexts %}
+					<tr>
+					<td> Source Text {{forloop.counter}}: <a href="/texts/source-text/{{text.id}}">{{text}}</a> </td> 
+					</tr>
+					{% endfor %}
+			  	</table>
+			  </p>
+			</div>
+	
 		</div>
 	</div>
 {% endblock %}
+
+
+<!-- End of list_all_source_texts.html -->

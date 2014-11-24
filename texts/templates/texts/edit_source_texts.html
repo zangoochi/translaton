@@ -1,0 +1,95 @@
+<!-- 
+===================================================================================================
+Description: edit_source_texts.html
+===================================================================================================
+
+Created by:   Abdullah Mashabi
+Date:		  11/21/14
+Contact Info: amashabi@kent.edu
+Changes made: Add the needed functionality to allow the admin view and save the edited source texts. 
+				(Ticket #711) and  (Ticket #710)
+
+
+================================================================================================== -->
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+	<h1>This is the source text for <span style="color:blue">{{name}}</span> </h1>
+	<div class="row panel callout radius">
+		<div class="large-12 columns new-source-entry">
+			<form action="/texts/save-edit-source/{{textId}}/" method="post">
+				{% csrf_token %}
+
+                    <div class="row">
+						<!-- Year input -->
+                        <div class="large-2 columns">
+                            <span data-tooltip aria-haspopup="true" class="tip-left" title="Year input must be four-digit integer">
+							<label for="year">Year<font color="red">*</font></label></span>
+                            <input id="year" name="year" type="text" value="{{year}}" disabled/>
+                        </div>
+						
+						<!-- Source Language drop-down list -->
+                        <div class="large-2 columns">
+                            <label for="sourceLanguage">Source Language <font color="red">*</font></label>
+                            <input id="sourceLanguage" name="text" type="text" value="{{sourceLanguage}}" disabled/>
+                        </div>
+						
+						<!-- Target Language drop-down list -->
+                        <div class="large-2 columns">
+                            <label for="targetLanguage">Target Language <font color="red">*</font></label>
+                            <input id="targetLanguage" name="text" type="text" value="{{targetLanguage}}" disabled/>
+                        </div>
+						
+						<!-- Set Number input -->
+                        <div class="large-2 columns">
+						<span data-tooltip aria-haspopup="true" class="tip-left" 
+						title="Set Number is a single-digit integer between 1-5">
+						<label for="setNumber">Set Number <font color="red">*</font></label></span>
+						<input id="setNumber" name="setNumber" type="text" value="{{setNumber}}" disabled/>
+                        </div>
+						
+						<!-- Passage Letter drop-down list -->
+                        <div class="large-2 columns">
+                            <label for="passageLetter">Passage Letter <font color="red">*</font></label>
+                            <input id="passageLetter" name="passageLetter" type="text" value="{{passageLetter}}" disabled/>
+                        </div>
+						
+						<!-- Version Number input -->
+                        <div class="large-2 columns">
+							<span data-tooltip aria-haspopup="true" class="tip-left" 
+							title="Version Number is normally 1 unless changes are made">
+							<label for="setNumber">Version Number <font color="red">*</font></label></span>
+							<input id="versionNumber" name="versionNumber" type="text" value="{{versionNumber}}" />
+                        </div>  
+						
+                    </div>
+					
+					<!-- Source Passage Input -->
+                    </br>
+                    <div class="row"> 
+                        <div class="large-12 columns">
+                            <label for="sourcePassage">Edit Source Passage <font color="red">*</font></label>
+							<textarea style="height:550px" id="text" name="text" value="{{text}}">{{text}}</textarea>
+                        </div>
+                    </div>
+					
+					<!-- Submit buttons -->
+                    <input class="button radius" style="margin-right:100px" type="submit" value="Edit Source" name="saveEditSource">
+					
+                </form>
+		</div>
+
+		<!-- bottom bar -->
+		<ul class="breadcrumbs">
+			<li><a href="/workflow/">Home</a></li>
+			<li><a href="/texts/list-of-all-source-texts/">list of all source tests</a></li>
+			<li class="current">{{name}}</a></li>
+		</ul>
+	</div>
+{% endblock %}
+
+
+<!-- End of edit_source_texts.html -->
+

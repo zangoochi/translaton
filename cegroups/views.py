@@ -1,18 +1,24 @@
 # =====================================================================================================
+#Description:
+# All views used by the cegroups application
+#
 # Created by: Brandon Kessell
 # Date: 13-OCT-2014
 # Version: 1.0
 # Contact info: bkessell@kent.edu
-# Description:
-# All views used by the cegroups application
-
-
+#
 #Edited By: Zach Montgomery
 #Contact Info: zmontgom@kent.edu
 #Date: 10/30/14
 #Changes Made: Created editUserOption, saveUserOption, and change_password. These changes are to add/edit users, 
 #				as well as change user input such as email address, first name, and last name. 
 
+#Edited by: Abdullah Mashabi
+#Date:10/31/14
+#Contact Info: amashabi@kent.edu
+#Changes made: Added the needed functionalities for groups section to allow the admin
+#			   to view, create, edit, and remove groups in the admin page. (Ticket #632)
+#
 #Edited By: Zach Montgomery
 #Contact Info: zmontgom@kent.edu
 #Date: 11/03/14
@@ -26,9 +32,6 @@
 #				By using these Decorators, we are able to stop a view from working. They are placed in a separate file for because since
 #				group names change, these will need to be changed to accomodate the new group names. This makes changing very easy and just
 #				need to change in one file.
-
-
-
 # =====================================================================================================
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, get_object_or_404
@@ -39,10 +42,16 @@ from cegroups.models import permOptions
 from cegroups.models import permObjects
 from cegroups.models import groupPermissions
 from cegroups.models import permObjectParent
+from texts.models import Language
+from userprofile.models import LanguagePair
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login
 from login.forms import NewUserForm
 from login.filters import *
+from texts.models import SourceText, TargetText
+from texts.forms import NewSourceTextForm
+from texts.models import Language, SourceText, sourceDiscrepancyQueue
+from texts.utils import findDifferenceInTexts
 
 
 
@@ -55,20 +64,27 @@ from login.filters import *
 
 #Tell Django this application has an index page as well as what views the index page is able to access
 def index(request):
+
 	users = User.objects.all()
-	groups = Group.objects.all()
 	form = NewUserForm()
+	groups = Group.objects.all()
+	permobjects = permObjects.objects.all()
+	languages = Language.objects.all()
+	grouppermissions = groupPermissions.objects.all()
+
 	return render(request, 'index.html', {	'userName' : getCurrentUserName(request),
 									'userId' : getCurrentUserId(request),
+									'groups':   groups,
 									'userGroups' : getCurrentGroups(request),
 									'permissions' : getPermissionsForUser(request),
 									'permissionhierarchy' : getPermissionsForHierarchy(request),
 									'permoptions' : getAllPermissionOptions(request),
+									'groupPermissions' : grouppermissions,
 									'permobjects' : getAllPermissionObjects(request),
 									'users'       : users	,
-									'groups'      :groups,
+									'permObjects' : permobjects,
+									'languages'   : languages,									
 									'form'        :form});
-
 
 #Returns the name of the currently logged in user
 def getCurrentUserName(request):
@@ -103,6 +119,10 @@ def getPermissionsForHierarchy(request):
 def getAllPermissionOptions(request):
 	return permOptions.objects.all().order_by("id");
 
+#Returns all group permission
+def getAllPermissionGroup(request):
+	return groupPermissions.objects.all().order_by("id");
+
 #Returns all permission objects
 def getAllPermissionObjects(request):
 	return permObjects.objects.all();
@@ -112,9 +132,6 @@ def savePermissionOption(request):
 	#iterate through the POST input
 	for saveId, saveDescription in request.POST.iteritems():
 		saveDescription = request.POST.get(saveId);
-
-		print saveId
-		print saveDescription
 		#the key will either be a description, or an option id
 		if saveId == "description":
 			option, wasCreated = permOptions.objects.get_or_create(description=saveDescription, defaults={"description": saveDescription});
@@ -125,15 +142,87 @@ def savePermissionOption(request):
 			option.save();
 	return HttpResponseRedirect('..');
 
+#Saves the permission object
+def savePermissionObject(request):
+	#iterate through the POST input
+	for saveId, saveName in request.POST.iteritems():
+		saveName = request.POST.get(saveId);
+		#the key will either be a description, or an option id
+		if saveId == "objectName":
+			po, wasCreated = permObjects.objects.get_or_create(objectName=saveName, defaults={"objectName": saveName});
+			po.save();
+		elif saveId.isdigit():
+			po = permObjects.objects.get(id=int(saveId));
+			po.objectName = saveName;
+			po.save();
+	return HttpResponseRedirect('..');
 
+
+# Saves the group name
+def saveGroupOption(request):
+	#iterate through the POST input
+	for saveId, saveGroup in request.POST.iteritems():
+		saveGroup = request.POST.get(saveId);
+	if saveId == "name":
+		option, wasCreated = Group.objects.get_or_create(name=saveGroup, defaults={"name":saveGroup});
+		option.save();
+	elif saveId.isdigit():
+		option = Group.objects.get(id=int(saveId));
+		option.name = saveGroup;
+		option.save();
+	return HttpResponseRedirect('..');
+
+# Edit the group name
+def editGroupOption(request):
+	if request.method == "POST":
+		groupname = False
+
+		for saveId, savegroupname in request.POST.iteritems():
+			savegroupname = request.POST.get(saveId)
+			if saveId == 'groupname':
+				groupname = True
+
+		for saveId, savegroupname in request.POST.iteritems():
+			if saveId.isdigit():
+				option = Group.objects.get(id=int(saveId))
+				if groupname == True:
+					option.name = savegroupname
+					option.save()
+					return HttpResponseRedirect('/cegroups/')
+					
+	return HttpResponseRedirect('/cegroups/');
+
+# Save and edit group permission
+def saveGroupPermission(request):
+	if request.method == "POST":
+		group = None
+
+		for saveId, savegroupname in request.POST.iteritems():
+			savegroupname = request.POST.get(saveId)
+
+			if Group.objects.filter(name=savegroupname).exists():
+				group = Group.objects.get(name=savegroupname)
+
+
+		for saveId, savegroupname in request.POST.iteritems():
+			if saveId.isdigit():
+				option = permObjects.objects.get(id = saveId)				
+				g, created = groupPermissions.objects.get_or_create(groupId=group, permObject=option)
+				if not created:
+					groupPermissions.objects.get(groupId=group, permObject=option).delete()
+					
+	return HttpResponseRedirect('/cegroups/');
+	
+#Used to edit chosen users first name and last name columns	
 def editUserOption(request):
 	if request.method == "POST":
 		lastSubmit = False
 		groupSubmit = False
 		passSubmit = False
 		emailSubmit = False
+		languageSubmit = False
 
-		#Decides if it is the first name submit form or last name submit form
+		#Decides which form is being submitted
 		for saveId, saveName in request.POST.iteritems():
 			saveName = request.POST.get(saveId)
 
@@ -148,6 +237,8 @@ def editUserOption(request):
 				passSubmit = True
 			elif saveId == 'emailSubmit':
 				emailSubmit = True
+			elif saveId == 'languageSubmit':
+				languageSubmit = True
 
 		#Gets User and sets either first_name or last_name depending on lastSubmit
 		for saveId, saveName in request.POST.iteritems():
@@ -167,17 +258,19 @@ def editUserOption(request):
 					option.password = pw
 					option.save()
 				elif emailSubmit == True:
-					print "Save name: "
-					print saveName
 					option.email = saveName
 					option.save()
+				elif languageSubmit == True:
+					lng = Language.objects.get(language=saveName)
+					pair, created = LanguagePair.objects.get_or_create(user=option, language=lng)
+					if not created:
+						LanguagePair.objects.get(user=option, language=lng).delete()
 				else:
 					option.first_name = saveName
 					option.save()
-					return HttpResponseRedirect('/cegroups/')
+					return HttpResponseRedirect('/cegroups/#users/')
 
 	return HttpResponseRedirect('/cegroups/');
-
 
 
 #Saves the permission type
@@ -228,7 +321,6 @@ def saveUserOption(request):
 		form = NewUserForm()
 	#return the form. 
 	users = User.objects.all()
-
 	return render(request, 'index.html', {	'userName' : getCurrentUserName(request),
 									'userId' : getCurrentUserId(request),
 									'userGroups' : getCurrentGroups(request),
@@ -242,7 +334,19 @@ def saveUserOption(request):
 #Deletes the given permission types
 def removePermissionOption(request):
 	todel = request.POST.getlist("todelete")
-	User.objects.filter(id__in=todel).delete();
+	permOptions.objects.filter(id__in=todel).delete();
+	return HttpResponseRedirect('..');
+
+#Deletes the given permission objects
+def removePermissionObject(request):
+	todel = request.POST.getlist("todelete")
+	permObjects.objects.filter(id__in=todel).delete();
+	return HttpResponseRedirect('..');
+	
+#Deletes the given group names
+def removeGroupOption(request):
+	todel = request.POST.getlist("grouptodelete")
+	Group.objects.filter(id__in=todel).delete();
 	return HttpResponseRedirect('..');
 
 #Deletes the given users
@@ -253,11 +357,6 @@ def removeUserOption(request):
 		user = User.objects.filter(id=op)
 		user.delete()
 	return HttpResponseRedirect('..')
-
-
-
-
-
 
 
 

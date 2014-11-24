@@ -1,8 +1,21 @@
-<!-- Zach Montgomery: edited iteration 2 week 4 -->
+<!-- #=====================================================================================================
+#Description:
+#Template for entering new Legacy Exams
+#=====================================================================================================
+
+#Edited by: Zach Montgomery
+#Date:11/11/14
+#Contact Info: zmontgom@kent.edu
+#Changes made: Included script that sorts through all the graders and their languages and assigns
+                appropriate graders to the grader1-grader4 options.
+
+#=====================================================================================================
+-->
 
 {% extends 'base/base.html' %}
 
 {% load staticfiles %}
+
 
 {% block body_block %}
 <body onload="filterSelectBox()">
@@ -104,14 +117,7 @@
          <div class="row">
             <div class="small-6 small-centered columns">
                 <label for="grader1">Grader #1<font color="red">*</font></label>
-                <select id="grader1" name="grader1">
-                    <!-- Uses the graderLanguage variable in records/views.py EnterNewExam function. Loops through and gets all individual grader -> language pair combinations-->
-                    {% for grader in graderLanguages %}
-                    	<option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
-                    }
-                    }
-                    {% endfor %}
-                </select>
+                <select id="grader1" name="grader1"></select>
                 {% for error in form.grader1.errors %}
                         <small class="error">{{  error  }}</small>
                 {% endfor %}
@@ -121,11 +127,7 @@
          <div class="row">
             <div class="small-6 small-centered columns">
                 <label for="grader2">Grader #2<font color="red">*</font></label>
-                <select id="grader2" name="grader2">
-                    {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
-                    {% endfor %}
-                </select>
+                <select id="grader2" name="grader2"></select>
                 {% for error in form.grader2.errors %}
                         <small class="error">{{  error  }}</small>
                 {% endfor %}
@@ -141,11 +143,7 @@
 	         <div class="row">
             <div class="small-6 small-centered columns">
                 <label for="grader3">Grader #3</label>
-                <select id="grader3" name="grader3">
-                    {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
-                    {% endfor %}
-                </select>
+                <select id="grader3" name="grader3"></select>
                 {% for error in form.grader3.errors %}
                         <small class="error">{{  error  }}</small>
                 {% endfor %}
@@ -157,11 +155,7 @@
 	         <div class="row">
             <div class="small-6 small-centered columns">
                 <label for="grader4">Grader #4</label>
-                <select id="grader4" name="grader4">
-                    {% for grader in graderLanguages %}
-                        <option data-language="{{ grader.language }}", data-gId="{{ grader.user_id}}"> {{ grader.user }}</option>
-                    {% endfor %}
-                </select>
+                <select id="grader4" name="grader4"></select>
                 {% for error in form.grader4.errors %}
                         <small class="error">{{  error  }}</small>
                 {% endfor %}
@@ -170,7 +164,6 @@
 	</div>    
 
 	<script type="text/javascript">
-
 		var grader3Div = document.getElementById('grader3Div');
 		var grader4Div = document.getElementById('grader4Div');
 
@@ -194,7 +187,6 @@
                 grader4Div.style.visibility = "hidden";
             }
         };
-
 	</script>
 
 
@@ -223,7 +215,100 @@
              
         </div>
 </div>
+<script type="text/javascript">
 
-<script type="text/javascript" src="/static/js/newExam.js"> 
+    //Create javascript array of Django dictionary. Will be an associative array of arrays
+    //Key(grader): Value(languages)
+    var array = [];
+        '{% for key, value in graderLanguages.items %}'
+            var list = [];
+            '{% for val in value %}'
+                list.push('{{val}}');
+            '{% endfor %}'
+            array.push({
+                key: '{{key}}',
+                value:list
+            });
+        '{% endfor %}'
+
+    //When the sourceLanguage changes, we must recalculate the assigned graders
+    $('#sourceLanguage').on('change', function(){
+        SetGraders();
+    })
+
+    //Wen the targetLanguage changes, we must recalculate the assigned graders
+    $('#targetLanguage').on('change', function(){
+        SetGraders();
+    })
+
+        //Wen the Grader3cb changes, we must recalculate the assigned graders
+    $('#grader3cb').on('change', function(){
+        SetGraders();
+    })
+
+        //Wen the Grader4cb changes, we must recalculate the assigned graders
+    $('#grader4cb').on('change', function(){
+        SetGraders();
+    })
+
+    //Assign graders on page load
+    $(document).ready(function(){
+        SetGraders();
+    })
+
+
+    //Clears the assigned graders and then sets new graders based on source language and target language
+    function SetGraders(){
+        $('#grader1').empty();
+        $('#grader2').empty();
+        $('#grader3').empty();
+        $('#grader4').empty();
+        var source = $('#sourceLanguage').val();
+        var target = $('#targetLanguage').val();
+        SetGraderOption(source, target)
+    }
+
+
+    //Sorts through all the graders and their languages and adds each grader as an available
+    //option if and only if the grader has the source language and target language as languagepairs
+    function SetGraderOption(src, target){
+        for(i=0; i<array.length; ++i){
+            var grader = array[i].key;
+            count = 0; 
+
+            for(j=0; j<array[i].value.length; ++j){
+                if(array[i].value[j] == src){
+                    count += 1;
+                }
+                if(array[i].value[j] == target){
+                    count += 1;
+                }
+            }
+            if(count == 2){
+                '{% for grader in graders %}'
+                if('{{grader.id}}' == grader){
+                    $('#grader1').append(new Option("{{grader}}", "{{grader.id}}"));
+                    $('#grader2').append(new Option("{{grader}}", "{{grader.id}}"));
+
+                    if($('#grader3cb').prop("checked")){
+                        $('#grader3').append(new Option("{{grader}}", "{{grader.id}}"));
+                    }
+                    if($('#grader4cb').prop("checked")){
+                        $('#grader4').append(new Option("{{grader}}", "{{grader.id}}"));
+                    }
+                }
+                '{% endfor %}'
+            }
+        }
+    }
+
+</script>
+
+<script type="text/javascript" src="/static/js/newExam.js"></script>
 
 {% endblock %}
+
+
+
+
+

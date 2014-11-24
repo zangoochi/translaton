@@ -14,7 +14,10 @@
 
 #Changes made: Check that both target texts for the exam are submitted. Once both parts are submitted
 #					then send both parts to the graderExamInput queue to be graded. 
-
+#Date:11/11/14
+#Contact Info: zmontgom@kent.edu
+#Changes made: Added variable graderLang to pass to template that allows us to gather all graders and their 
+#				languages as Key:Value pairs.
 #=====================================================================================================
 
 
@@ -28,6 +31,7 @@ from records.models import Record
 from records.forms import NewExamForm
 from texts.forms import TextReviewForm
 from userprofile.models import LanguagePair
+import json
 
 
 import os, imp
@@ -38,14 +42,7 @@ FILE_UPLOAD_DIR = os.path.join(settings.BASE_DIR, 'static','pdf')
 
 #1rst following view def will be deleted once login and session is in place
 def index(request):
-	group = Group.objects.get(name='Grader')
-		
-	#This is a set of all the users in the group 'Grader'
-	graders = group.user_set.all()
-
-	#Assigns graderLanguages all the graders and their language pairs
-	graderLanguages = LanguagePair.objects.filter(user_id = graders)
-	return render(request, 'records/index.html', {'graderLanguages': graderLanguages})
+	return render(request, 'records/index.html', {})
 
 #enter a new target text into the DB
 def enterExamRecord(request, examNumber="1", passageNumber="1"):
@@ -110,7 +107,12 @@ def enterNewExam(request):
 					       sourceLanguage        = Language.objects.all().get(language = form.cleaned_data["sourceLanguage"]),
 					       targetLanguage        = Language.objects.all().get(language = form.cleaned_data["targetLanguage"]))
             
-			if(newExam.grader1 != newExam.grader2):    
+			if(newExam.grader1 != newExam.grader2):  
+				if(newExam.grader3 == ""):
+					newExam.grader3 = None
+
+				if(newExam.grader4 == ""):
+					newExam.grader4 = None
 				newExam.save()
 			else:
 				group = Group.objects.get(name='Grader')
@@ -126,11 +128,15 @@ def enterNewExam(request):
 			#Zach Montgomery: all the variables needed in order to get the grader lanugagepairs
 			group = Group.objects.get(name='Grader')
 			graders = group.user_set.all()
-			graderLanguages = LanguagePair.objects.filter(user_id = graders)
-			languages = LanguagePair.objects.all()
-			print languages;
+		
+			graderLangs = {}
+			for grader in graders:
+				l = ()
+				for lang in grader.languagepair_set.all():
+					l += (lang.language.language,)
+				graderLangs[grader.id] = l
 
-			return render(request, 'records/enter_exam.html', {'form' : form, 'graderLanguages' : graderLanguages})
+			return render(request, 'records/enter_exam.html', {'form' : form, 'graderLanguages' : graderLangs, 'graders':graders})
 
 	else: #Else gets called the first time the page loads when there had been no submit
 
@@ -139,13 +145,18 @@ def enterNewExam(request):
 		
 		#This is a set of all the users in the group 'Grader'
 		graders = group.user_set.all()
-		#Assigns graderLanguages all the graders and their language pairs
-		graderLanguages = LanguagePair.objects.filter(user_id = graders)
-		print graderLanguages
 
+		#Dictionary of graders as keys and a tuple of their languages as values
+		#Key(grader): Value(language, language, etc.)
+		graderLangs = {}
+		for grader in graders:
+			l = ()
+			for lang in grader.languagepair_set.all():
+				l += (lang.language.language,)
+			graderLangs[grader.id] = l
 
 		#returns an empty form and all of the grader -- languagepair combinations		
-		return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages' : graderLanguages})
+		return render(request, 'records/enter_exam.html', {'form' : NewExamForm(), 'graderLanguages':graderLangs, 'graders':graders})
 		
 def listAllQuedRecords(request):
 	return render(request, 'records/list_all_qued_records.html', {'records' : Record.objects.all()})

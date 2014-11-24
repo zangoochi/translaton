@@ -27,7 +27,6 @@ class permObjects(models.Model):
 class groupPermissions(models.Model):
 	groupId = models.ForeignKey(Group, null=True, related_name='+')
 	permObject = models.ForeignKey(permObjects)
-	permOption = models.ForeignKey(permOptions)
 
 # Model used to hold hierachy of objects such as buttons belonging to a menu
 class permObjectParent(models.Model):

@@ -12,3 +12,4 @@ class LanguagePair(models.Model):
     def __unicode__(self):
         return "{0} --- {1}".format(self.user.username, self.language.language)
 
+

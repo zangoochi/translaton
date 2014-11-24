@@ -1,0 +1,28 @@
+<script type="text/javascript">
+    $(document).ready(function(){
+        var fileList = "{{fileList}}"
+        fileList = fileList.replace("&quot;", "");
+        fileList = fileList.replace("&quot;", "");
+        showFiles(fileList);
+    });
+
+    function showFiles(fileList){
+        var fl = fileList.split(":")
+        for(var i = 0; i < fl.length; i++){
+            var file = fl[i];
+            if(file != ""){
+                addFileLink(fl[i]);
+            }
+        }
+    }
+
+    function addFileLink(filePath){
+        var rep = document.getElementById("divfiles");
+        var newSpan = document.createElement("span");
+        newSpan.innerHTML = "<br><a href='/static/img/" + "{{ request.session.session_key }}" + "/" + filePath + "'>" + filePath + "</a><br>";
+        rep.appendChild(newSpan);
+    }
+</script>
+<br>
+<div id="divfiles" style="padding-left:15%; padding-right:15%">
+</div>

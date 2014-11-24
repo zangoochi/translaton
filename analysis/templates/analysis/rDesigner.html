@@ -1,0 +1,66 @@
+<!--
+===================================================================================================
+Description: Landing page for the R designer system
+===================================================================================================
+-->
+{% extends 'base/base.html' %}
+
+{% load staticfiles %}
+
+{% block body_block %}
+<div class="row">
+	<div class="large-12 columns">
+  		<h1>R Designer</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="small-12 small-centered columns panel callout radius profile-content">
+		<div class="center-tabs">
+			<dl class="tabs" data-tab>
+				<dd><a href="#rview">View</a></dd>
+				<dd><a href="#rcreate">Create</a></dd>
+				<dd><a href="#redit">Edit</a></dd>
+				<dd><a href="#rdelete">Delete</a></dd>
+				<dd><a href="#rexecute">Execute</a></dd>
+				{% if fileList %}
+				<dd><a href="#rresults">Results</a></dd>
+				{% endif %}
+			</dl>
+		</div>
+		<div class="tabs-content">
+			<div class="content" id="rview" style="width:100%">
+				<div class="row">
+					{% include "r_view.html" %}
+				</div>
+			</div>
+			<div class="content" id="rcreate" style="width:100%">
+				<div class="row">
+					{% include "r_create.html" %}
+				</div>
+			</div>
+
+			<div class="content" id="redit" style="width:100%">
+				<div class="row">
+					{% include "r_edit.html" %}
+				</div>
+			</div>
+			<div class="content" id="rdelete" style="width:100%">
+				<div class="row">
+					{% include "r_delete.html" %}
+				</div>
+			</div>
+			<div class="content" id="rexecute" style="width:100%">
+				<div class="row">
+					{% include "r_execute.html" %}
+				</div>
+			</div>
+			<div class="content" id="rresults" style="width:100%">
+				<div class="row">
+					{% include "r_results.html" %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+<!-- =====   End of index.html  ===== -->

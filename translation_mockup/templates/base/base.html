@@ -13,9 +13,33 @@ Changes made: Added jquery function to traverse object permissions based off of 
 
 				The JQuery script calls userObjects which is in translation_mockup/templatetags def: userObjects. 
 				The template tag is a context processor which is variables that are automatically loaded for every page. 
-				By creating the template tags and giving the path in translation_mockup/settings.py under TEMPLATE_CONTEXT_PROCESSORS. As long as the base class is loaded into the page, this will get all user 
-				objects and remove them. If there is no user, then the userObjects are empty and nothing is removed. 
-				Works the same for admin, since admin shouldn't be hidden from anything, their objects will return empty so nothing is removed.			    		
+				By creating the template tags and giving the path in translation_mockup/settings.py under TEMPLATE_CONTEXT_PROCESSORS. As long as the base class is loaded into the page, 
+				this will get all user objects and remove them. If there is no user, then the userObjects are empty and nothing is removed. 
+				Works the same for admin, since admin shouldn't be hidden from anything, their objects will return empty so nothing is removed.
+
+Edited by: Zach Montgomery
+Date: 11/18/2014
+Contact info: zmontgom@kent.edu
+Changes made: Added more Jquery that checks if the administrator is in the object finding stage or if the page should be in regular mode. 
+			  This check uses file check.js in static/js/check.js that stores the check and objects located as session variables. 
+			  I chose session variables because if a user is in object detection mode, since we are using the same website that all the users use, 
+			  we did not want to interfere with other users, so with session variables we are able to only change the outcome for the user/browser 
+			  that is using them. Also added a dialog box using jquery ui dialog. Created a span around the majority of the body to handle 
+			  the .click events to find the objects, and a div outside the span to enable the message body of the alert box. The alert box has 
+			  three buttons which allow the user to continue(close and select, the user can also just select another item and it will change, 
+			  do not have to use continue unless the user wants to follow a link to another page), Get object which stores the object as 
+			  a session variable array usin JSON encode and JSON decode, and a Finish button that takes you out of object detection mode by changing the 
+			  check state and redirects you back to the administrator page. About lines 117-180					    		
+
+Edited by: Abdullah Mashabi
+Date: 11/21/14
+Contact Info: amashabi@kent.edu
+Changes made: Added dropdown list in the top navigation bar. (tiecket # )
+			  In the top navigation bar, users can click on their name, and they will get a dropdown list which has two options, 'Account Settings' or 'Logout'
+			  This dropdown list can be also used in the future if there is a need to add more functionality to the users. The administrator page option, admin, is 
+			  still in the top navigation bar because it is administrator use only. 
+
+===========================================================================================================================================================
 -->
 
 
@@ -29,43 +53,83 @@ Changes made: Added jquery function to traverse object permissions based off of 
 	{% load staticfiles %}
 	{% load translation_extras %}
 
+
+
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/foundation.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/grade.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.css' %}" />
+
+	<script type="text/javascript" src="{% static 'js/grade.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/modernizr.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/dropzone.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/check.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
+
 </head>
 <body>
+
+<!-- Top navigation bar -->
+<span id="body">
 	<div class="contain-to-grid sticky">
 		<nav class="top-bar" data-topbar>
+			
+			<!-- left navigation section -->
 			<ul class="title-area">
 				<li class="name">
 					<h1><a id="trans-nav" style="padding-left:0px" href="/">Translation</a></h1>
 				</li>
 			</ul>
-
+			
+			<!--right navigation section -->
 			<section class="top-bar-section">
-				<!-- Right Nav Section -->
 				<ul class="right">
+				
 					{% if user.is_authenticated %}
-					<li><a id="admin-nav" style="align:center" href="/cegroups">Admin</a></li>
-					<li><a id="logout-nav" href="/login/logout/"> Logout </a></li>
-					<li><a id="user-nav" href="/profile/{{ user }}/">{{ user }}</a></li>
+					<!-- The administrator page option -->
+					<li class="has-form">
+						<li><a id="admin-nav" style="align:center" href="/cegroups">Admin</a></li>  
+					</li>
+
+					<!-- dropdown list -->
+					<li class="has-dropdown">
+						<a id="user-settings">{{ user }}</a>
+						<ul class="dropdown">
+							<li><a id="account-settings" href="/profile/{{ user }}/">Account settings</a></li>
+							<li><a id="logout" href="/login/logout/"> Logout </a></li>
+						</ul>
+					</li>
+					
+					<!-- The login page option -->
 					{% else %}
 					<li><a href="/login/"> Login </a></li>
 					{% endif %}
+					
 				</ul>
 			</section>
+			
 		</nav>
 	</div>
-
 	{% block body_block %} This is default template content {% endblock %}
+</span>
+
+
+	<div id="dialog" style="display:hidden">
+<pre>
+Press:
+  Continue to keep searching
+  Get Object to store object
+  Finish to stop searching 
+</pre><br/>
+
+		<span id="object_id" style="color:red"></span>
+
+	</div>
+
 	<script src="{% static 'js/fastclick.js' %}"></script>
 	<script src="{% static 'js/foundation.min.js' %}"></script>
 	<script>$(document).foundation();</script>
-	<script type="text/javascript" src="{% static 'js/grade.js' %}"></script>
-
 
 
 <!--Script that uses JQuery to remove elements within a page. This calls
@@ -78,31 +142,85 @@ Changes made: Added jquery function to traverse object permissions based off of 
 	will return empty so nothing is removed.  -->
 	<script type="text/javascript">
 		{% for userob in userObjects %}
-
 			var name = '#' + '{{userob.permObject.objectName}}';
 			$(name).remove();
 		{% endfor %}
-
 	</script>
 
+<!-- JQuery script that uses check.js to check if the admin is searching for object names. If the admin checks the 
+		checkbox to find objects on the admin page, then this script will be called to remove submits and displays 
+		objects names on click. Also provides dialog option to present and give options for the objects. Can continue, get object
+		and finish the object search -->
+	<script type="text/javascript">
 
+	if(get_check() == "True"){
 
-<!--	/*<script type="text/javascript">
+	$(window).keydown(function(event){
+    	if(event.keyCode == 13) {
+      		event.preventDefault();
+      		return false;
+   		 }
+  	});
 
-		$('body').click(function(event){
-
+		$('#body').click(function(event){
     	var id = event.target.id;
-    	//var id=$(this).attr('id');
-    	alert (id);
+    	$('#object_id').html("<b style='color:black'>Object: </b> " + id);
 
-		});
+    		open_dialog(id);
+    		event.preventDefault();
+
+	});	
 
 		$('[type=submit]').each(function () {
-			alert("submit link");
-			this.remove()
-
+			this.remove();
 		});
-	</script> */-->
+	}
+
+function open_dialog(value){
+	set_id(value);
+	$('#dialog').dialog("open");
+}
+	
+	$( '#dialog' ).dialog({
+		autoOpen: false,
+		width: 400,
+		title: "Find Object",
+		buttons: [
+			{
+				text: "Continue",
+				click: function() {
+					var id = "#" + get_id();
+					var href = $(id).attr('href');
+					$(this).dialog("close");
+					if(href != null){
+						window.location.href = href;
+					}	
+				}
+			},	
+			{
+				text: "Get Object",
+				click: function() {
+					var value = get_id();
+					set_object(value);
+					$('#object_id').html("<b style='color:black'>Stored Object: </b> " + value);
+				}
+			},				
+			{
+				text: "Finish",
+				click: function() {
+					set_check("False");
+					window.location.href = "/cegroups/";
+					$(this).dialog("close");
+				}
+			}
+		]
+	});
+	
+
+
+</script>
+
+
 
 </body>
 </html>

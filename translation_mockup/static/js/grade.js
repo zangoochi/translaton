@@ -1,45 +1,24 @@
 //calls the grading rubric window
-function popup(mylink, windowname)
-{
-if (! window.focus)return true;
-var href;
-if (typeof(mylink) == "string")
-   href=mylink;
-else
-   href=mylink.href;
-window.open(href, windowname, "width=1600,height=800,scrollbars=yes");
-return false;
+function popup(mylink, windowname){
+	
+	if (! window.focus)
+		return true;
+	
+	var href;
+	if (typeof(mylink) == "string")
+   		href=mylink;
+	else
+   		href=mylink.href;
+	
+	window.open(href, windowname, "width=1600,height=800,scrollbars=yes");
+	return false;
 };
 
-//function populates the error code table and dynamically populates the error values table
-function populate(eCode,eValue)
-{
-	
-	var eCode = document.getElementById(eCode);
-	var eValue = document.getElementById(eValue);
-	eValue.innerHTML = "";
-	if(eCode.value == "A" || eCode.value == "O" || eCode.value == "T" || eCode.value == "R" || eCode.value == "F" || eCode.value == "L" || eCode.value == "FC" || eCode.value == "IND" || eCode.value == "I" || eCode.value == "AMB" || eCode.value == "UNF" || eCode.value == "ILL" || eCode.value == "OTH" || eCode.value == "MT" || eCode.value == "MU" || eCode.value == "a" || eCode.value == "o" || eCode.value == "t" || eCode.value == "r" || eCode.value == "f" || eCode.value == "l" || eCode.value == "fc" || eCode.value == "ind" || eCode.value == "i" || eCode.value == "amb" || eCode.value == "unf" || eCode.value == "ill" || eCode.value == "oth" || eCode.value == "mt" || eCode.value == "mu")
-		{
-		var optionArray = ["|","1|1","2|2","4|4","8|8","16|16"];
-		} 
-	else if(eCode.value == "G" || eCode.value == "SY" || eCode.value == "P" || eCode.value == "D" || eCode.value == "C" || eCode.value == "WF" || eCode.value == "U" || eCode.value == "ST" || eCode.value == "g" || eCode.value == "sy" || eCode.value == "p" || eCode.value == "d" || eCode.value == "c" || eCode.value == "wf" || eCode.value == "u" || eCode.value == "st" )
-		{
-		var optionArray = ["|","1|1","2|2","4|4"];
-		}
-	else if(eCode.value == "SP" || eCode.value == "sp" )
-		{
-		var optionArray = ["|","1|1","2|2"];
-		}
-	for (var option in optionArray)
-		{
-		var pair = optionArray[option].split("|");
-		var newOption = document.createElement("option");
-		newOption.value = pair[0];
-		newOption.innerHTML = pair[1];
-		eValue.options.add(newOption);
-		}
-};
-//confirmation window function
+
+
+
+
+//confirmation window function for grading page
 function confirmEnd()
 {	
 		var agree=confirm("You are about to finalize your grading?\nOnce finalized, changes cannot be made.\nAre you sure?");
@@ -60,6 +39,9 @@ function confirmEnd()
 		else return false;
 };
 
+
+
+//Error add confirmation popup
 function confirmAdd()
 {
 		var agree=confirm("Are you sure you want to add this error?");
@@ -70,6 +52,8 @@ function confirmAdd()
 	
 };
 
+
+//Quality points add confirmation popup
 function confirmAddQty()
 {
 		var agree=confirm("Are you sure you want to add quality ponts?");
@@ -90,21 +74,44 @@ function confirmDel()
 		{return false;}
 };
 
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//Add function to show buttons in correct order
+
+
+
+
 function showAddError()
 {
 	document.getElementById("add_error").style.display = "block";
+	// document.getElementById("add_error").focus();
 	document.getElementById("control_buttons").style.display = "none";
 	document.getElementById("add_error_menu").style.display = "none";
-	document.getElementById("quality_pts").style.display = "none";
-	document.getElementById("quality_pts_menu").style.display = "none";
+	// vstepona 10 30 2014 due to removal of qty button
+	// document.getElementById("quality_pts").style.display = "none";
+	// document.getElementById("quality_pts_menu").style.display = "none";
 	document.getElementById("delete_error").style.display = "none";
 	document.getElementById("comment_table").style.display = "none";
-	document.getElementById("start_high").disabled = false;
-	document.getElementById("end_high").disabled = true;
+	// document.getElementById("start_high").disabled = false;
+	document.getElementById("start_high").style.display = "";
+	// document.getElementById("start_high").click();
+	document.getElementById("start_high").focus();
+	document.getElementById("end_high").style.display = "none";
+
+	//Turn on the highlighting vstepona 11/11/2014
+	document.getElementById("start_high").click();
 };
 
+function setSelectValue (id, val) {
+    document.getElementById(id).value = val;
+    // document.getElementById(id).value = document.getElementById("slct1").value;
+}
+
+
 function showAddErrorMenu()
-{			
+{		
 	document.getElementById("add_error_menu").style.display = "block";	
 	document.getElementById("control_buttons").style.display = "none";
 	document.getElementById("add_error").style.display = "none";
@@ -112,32 +119,10 @@ function showAddErrorMenu()
 	document.getElementById("quality_pts_menu").style.display = "none";
 	document.getElementById("delete_error").style.display = "none";
 	document.getElementById("comment_table").style.display = "none";
-
 };
 
-function showQtyPts()
-{
-	document.getElementById("quality_pts").style.display = "block";
-	document.getElementById("control_buttons").style.display = "none";
-	document.getElementById("add_error").style.display = "none";
-	document.getElementById("add_error_menu").style.display = "none";
-	document.getElementById("quality_pts_menu").style.display = "none";
-	document.getElementById("delete_error").style.display = "none";
-	document.getElementById("comment_table").style.display = "none";
-	document.getElementById("qty_start_high").disabled = false;
-	document.getElementById("qty_end_high").disabled = true;
-};
 
-function showQtyPtsMenu()
-{			
-	document.getElementById("quality_pts_menu").style.display = "block";	
-	document.getElementById("control_buttons").style.display = "none";
-	document.getElementById("add_error").style.display = "none";
-	document.getElementById("add_error_menu").style.display = "none";
-	document.getElementById("quality_pts").style.display = "none";
-	document.getElementById("delete_error").style.display = "none";
-	document.getElementById("comment_table").style.display = "none";
-};
+
 
 
 function showDeleteError()
@@ -162,26 +147,40 @@ function showCommentTable()
 	document.getElementById("delete_error").style.display = "none";
 };
 
+
+
+
 //ENABLES DISABLES START/END HIGHLIGHT OPPOSITE OF EACH OTHER
 function highlight_buttons()
 {
-
 	
 	var elem = document.getElementById("start_high");
-	elem.disabled = (elem.disabled == true) ? false : true;
+
+	if (elem.style.display == "")
+	{
+		elem.style.display = "none";
+	}
+	else
+	{
+		elem.style.display = "";
+	}
+
+
 	elem = document.getElementById("end_high");
-	elem.disabled = (elem.disabled == true) ? false : true;
+	if (elem.style.display == "none")
+	{
+		elem.style.display = "";
+	}
+	else 
+	{
+		elem.style.display = "none";
+	}
+	elem.disabled =  false;
+
 };
 
-function qty_highlight_buttons()
-{
 
-	
-	var elem = document.getElementById("qty_start_high");
-	elem.disabled = (elem.disabled == true) ? false : true;
-	elem = document.getElementById("qty_end_high");
-	elem.disabled = (elem.disabled == true) ? false : true;
-};
+
 //RESEST ALL TO INITIAL STATES
 function reset_highlight()
 {
@@ -190,13 +189,6 @@ function reset_highlight()
 	document.getElementById('end_high').disabled = true;
 };
 
-//RESEST ALL TO INITIAL STATES
-function qty_reset_highlight()
-{
-	document.getElementById("control_buttons").style.display = "none";
-	document.getElementById('qty_start_high').disabled = false;
-	document.getElementById('qty_end_high').disabled = true;
-};
 
 //FUNCTION USED TO HIDING THE COMMENTS TABLE
 function close_table()
@@ -261,3 +253,4 @@ function getCookie(name)
     }
     return cookieValue;
 }
+

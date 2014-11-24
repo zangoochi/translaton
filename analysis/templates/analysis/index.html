@@ -117,8 +117,9 @@
     }
 
 
-    function generateGraph(type,format){
-        request_url = 'generateGraph';
+    function generateGraph(type,format,panel){
+        request_url = 'generateGraph'; 
+	var plot_div = panel;
             $.ajax({
                 method: "get",
                 url: request_url,
@@ -128,12 +129,12 @@
                         "&passage=" + $("#Passage").val() +
                         "&type=" + type +
                         "&format=" + format,
-
                success: function(response) {
-                  document.getElementById("plot_div").innerHTML = response;
-                
+                  document.getElementById(plot_div).innerHTML = response;
+                 alert("Success");
                },
                failure: function(response){
+			alert("failure");
                }
              });
     }
@@ -156,10 +157,16 @@
       </dl>
       <div class="tabs-content">
           <div class="content" id="panel2-1">
-            <p>These will be already coded queries that will run with the push of a button. Nothing needed from user</p>
+           <div class="row">
+                            <button type="button" class="small" onclick="generateGraph('mainAnalysis', '', 'main_analysis')">Main Analysis Test</button>
+				<div id="main_analysis" align="center"></div>
+	   </div>
           </div>
         <div class="content" id="panel2-2">
-            <p>These will be queries that will take parameters from administrator and run queries that pertain to users</p>
+            <div class="row">
+                            <button type="button" class="small" onclick="generateGraph('userAnalysis', '', 'user_analysis')">User Analysis Test</button>
+				<div id="user_analysis" align="center"></div>
+	   </div>
           </div>                
           <div class="large-12 columns content active" id="panel2-3">
                     <div class="row">
@@ -202,19 +209,19 @@
                             </div>
                        <div id="query" class="row" style="font-style:italic;font-size: 10pt;" > * required</div>
                        <div class="row">
-                            <button type="button" class="small" onclick="generateGraph('passFail')">Pass/Fail Analysis</button>
-                            <button type="button" class="small" onclick="generateGraph('avgScore')">Avg. Score Analysis</button>
+                            <button type="button" class="small" onclick="generateGraph('passFail', '', 'exam_analysis')">Pass/Fail Analysis</button>
+                            <button type="button" class="small" onclick="generateGraph('avgScore','', 'exam_analysis')">Avg. Score Analysis</button>
                             
                             <button data-dropdown="drop2" class="button small dropdown">Error Analysis</button>
                 <ul id="drop2" data-dropdown-content class="f-dropdown">
-                    <li><a onclick="generateGraph('errorBreakdown', 'byHalf')">By Half</a></li>
-                    <li><a onclick="generateGraph('errorBreakdown', 'byQuarter')">By Quarter</a></li>
-                    <li><a onclick="generateGraph('errorBreakdown', 'HalfwithScore')">By Half With Score</a></li>
-                    <li><a onclick="generateGraph('errorBreakdown', 'QuarterwithScore')">By Quarter With Score</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'byHalf', 'exam_analysis')">By Half</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'byQuarter', 'exam_analysis')">By Quarter</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'HalfwithScore', 'exam_analysis')">By Half With Score</a></li>
+                    <li><a onclick="generateGraph('errorBreakdown', 'QuarterwithScore', 'exam_analysis')">By Quarter With Score</a></li>
                 </ul>
                 
                       </div>
-                      <div id="plot_div" align="center"></div>
+                      <div id="exam_analysis" align="center"></div>
           </div>
           <div class="content" id="panel2-4">
             <p>Search Keywords</p>
@@ -240,4 +247,5 @@
   <script src="/static/js/underscore.js"></script>
   <script src="/static/js/backbone.js"></script>
   <script src="/static/js/keyword.js"></script>
+
 {% endblock %}

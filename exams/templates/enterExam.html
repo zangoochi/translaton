@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+ 
+{% load staticfiles %}
+
+{% block body_block %}
+
+		<h1>Please Enter an Exam</h1>
+		<form action="/exams/enter-exam/" method="post" id="examForm">{% csrf_token %}
+			<input type="text" name="examNumber" placeholder="Exam Number"><br />
+			<input type="text" name="grader1" placeholder="Grader 1"><br />
+			<input type="text" name="grader2" placeholder="Grader 2"><br />
+			<textarea name="source1" form="examForm" placeholder="Source Text 1"></textarea><br />
+			<textarea name="source2" form="examForm" placeholder="Source Text 2"></textarea><br />
+			<textarea name="target1" form="examForm" placeholder="Target Text 1"></textarea><br />
+			<textarea name="target2" form="examForm" placeholder="Target Text 2"></textarea><br />
+			Language: <select required id="language" class="select_box" name="language">
+				{% for language in languages %}
+				<option value="{{language.language}}">{{ language.displayName }}</option>
+				{% endfor %}
+			</select><br />
+			<input type="submit" class="button"><br />
+		</form>
+{% endblock %}

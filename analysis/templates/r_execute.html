@@ -1,0 +1,138 @@
+<script type="text/javascript">
+	//Once the page is ready for client processing
+	$(document).ready(function(){
+		clearDynamicForms();
+		//Set the index of the drop down to -1
+		$('#dd_rfunctions').prop('selectedIndex', -1)
+	});
+
+	function clearDynamicForms(){
+		//Hide the div with the execution form
+		$('#divformrexecute').hide();
+		//Hide the parameters listing
+		$('#parmListing').hide();
+		//Clear parameters
+		var parmList = document.getElementById("rexecuteparms");
+		while(parmList.firstChild){
+			parmList.removeChild(parmList.firstChild);
+		}
+	}
+
+	//Function that is called when the dropdown selection changes
+	function populateFormRExecute(){
+		clearDynamicForms();
+		populateRFunctionBase();
+		populateRFunctionParms();
+		setFunctionID();
+	};
+
+	function populateRFunctionBase(){
+		//Use ajax to retrieve the r function info
+		$.ajax({
+			method: "get",
+			url: "getFunctionData",
+			data: "value=" +  $("#dd_rfunctions").val(),
+			dataType: "text",
+			beforeSend: function(x) {
+				if(x && x.overrideMimeType) {
+					x.overrideMimeType("application/j-son;charset=UTF-8");
+				}
+			},
+			success: function(data) {
+				var json = JSON.parse(data), i;
+				//Iterate through the rfunction data
+				$(json).each(function(i,val){
+					$.each(val,function(k,v){
+						//We only need the fields data
+						if(k == "fields"){
+							$(v).each(function(i,val){
+								$.each(val,function(k,v){
+									//Fill in the Description
+									if(k == "Description")
+										document.getElementById("rfuncdesc").innerHTML = v;
+								});
+							});
+						}
+					});
+				});
+
+				//Show the form
+				$('#divformrexecute').show();
+			},
+		    failure: function(data) {
+				alert("Data retrieval failure")
+			}
+		});
+	};
+
+	function populateRFunctionParms(){
+		//Use ajax to retrieve the r function info
+		$.ajax({
+			method: "get",
+			url: "getFunctionParms",
+			data: "value=" +  $("#dd_rfunctions").val(),
+			dataType: "text",
+			beforeSend: function(x) {
+				if(x && x.overrideMimeType) {
+					x.overrideMimeType("application/j-son;charset=UTF-8");
+				}
+			},
+			success: function(data) {
+				var json = JSON.parse(data), i;
+				//Iterate through the rfunction data
+				$(json).each(function(i,val){
+					$.each(val,function(k,v){
+						//We only need the fields data
+						if(k == "fields"){
+							$(v).each(function(i,val){
+								$('#parmListing').show();
+								$.each(val,function(k,v){
+									//Add the parameter input
+									if(k == "parameter")
+										addParmeterInput(v);
+								});
+							});
+						}
+					});
+				});
+			},
+		    failure: function(data) {
+				alert("Data retrieval failure")
+			}
+		});
+	};
+
+	function addParmeterInput(parmName){
+		var rep = document.getElementById("rexecuteparms");
+		var newSpan = document.createElement("span");
+		newSpan.innerHTML = "<br><b>" + parmName + ": </b><input id='" + parmName + "' /><br>";
+		rep.appendChild(newSpan);
+	}
+
+	function setFunctionID(){
+		var elem = document.getElementById("FunctionID");
+		elem.value = $("#dd_rfunctions").val();
+	}
+</script>
+<center>
+<div style="width:35%;">
+	<label for="dd_rfunctions" style="cursor: default"><b>R Function</b></label>
+	<select id="dd_rfunctions" onchange="populateFormRExecute()">
+		{% for function in rfunctions %}
+			<option value="{{ function.id }}">{{ function.Name }}</option>
+		{% endfor %}
+	</select>
+</div>
+</center>
+<div id="divformrexecute" style="margin-left:15%;">
+	<form id="formrexecute" action="executeRFunction" method="POST">{% csrf_token %}
+		<input type="hidden" name = "FunctionID" id = "FunctionID">
+		<span><b>Description:</b><p id="rfuncdesc">R Function Description</p></span>
+		<div id="parmListing">
+			<span><b>Parameters:</b></span>
+			<div id="rexecuteparms"></div>
+		</div>
+		<br>
+		<div style="text-align:center; margin-right:15%"><button type="submit" class="small" value="Submit">Execute</button></div>
+	</form>
+</div>

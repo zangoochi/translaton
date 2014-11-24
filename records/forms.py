@@ -1,17 +1,16 @@
-#=====================================================================================================
+#==================================================================================================================
 #Description:
-#Django form for entering new exams. All exams have the fields: year, exam number, secondPassage, graders,
-#source language, target language, and the source texts that are a part of the exam.
-#=====================================================================================================
-
-
-
-
-#=====================================================================================================
-
-
-
-
+#forms.py for exam record entry. This is where the form is being created as well as conditions are set up. 
+#==================================================================================================================
+#
+#Edited by: Abdullah Mashabi
+#Date:10/17/14
+#Contact Info: amashabi@kent.edu
+#Changes made: Add the needed functionalities in the new exam record entry form.
+#
+#Changes made:
+#
+#==================================================================================================================
 
 from django import forms
 from django.contrib.auth.models import User, Group
@@ -47,8 +46,8 @@ class NewExamForm(forms.Form):
 
 		self.fields['grader1'] = forms.ChoiceField(choices = _getGraderTuples())
 		self.fields['grader2'] = forms.ChoiceField(choices = _getGraderTuples())
-		self.fields['grader3'] = forms.ChoiceField(choices = _getGraderTuples())
-		self.fields['grader4'] = forms.ChoiceField(choices = _getGraderTuples())
+		self.fields['grader3'] = forms.ChoiceField(choices = _getGraderTuples(), required=False)
+		self.fields['grader4'] = forms.ChoiceField(choices = _getGraderTuples(), required=False)
 
 
 		for i in range(2):

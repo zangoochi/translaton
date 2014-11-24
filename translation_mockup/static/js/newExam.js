@@ -1,23 +1,27 @@
+/* 
+#=====================================================================================================
+#Description:
+#Javascript used to sort source texts and target texts
+#=====================================================================================================
+
+#Edited by: Zach Montgomery
+#Date:11/11/14
+#Contact Info: zmontgom@kent.edu
+#Changes made: Removed all code associated with setting graders as options in entering a new Legacy Exam
+
+#=====================================================================================================
+*/
+
+
 //Save a copy of all of the oprions for filtering
 var unfilteredSourceTexts = new Array();
-var unfilteredGraders     = new Array();
-
 
 var sourceTexts = document.getElementById('sourceText1').options;
 for(var i = 0; i < sourceTexts.length; ++i)
 {	
     unfilteredSourceTexts[i] = sourceTexts[i];   
 }
-
-/* On form load, grader1 will include all the graders by default, so this sets 
-unfilteredGraders to be the list of graders before removing the graders that do
-not include the correct language in their languagepairs */
-var graders = document.getElementById('grader1').options;
-
-for(var i = 0; i < graders.length; ++i)
-{
-    unfilteredGraders[i] = graders[i];        
-}     
+   
 /* Wire up on change functions by adding an even listener. If the event listener is called
 then the filterSelectBox() function is called. Want to listen to year, source language 
 and target language for limiting the options of the graders and source text files and also
@@ -64,10 +68,7 @@ function filterSelectBox()
      the data in unfilteredGraders and unfilteredSourceTexts*/
     removeObjectsFromSelectBox(selectBox1);
     removeObjectsFromSelectBox(selectBox2);
-    removeObjectsFromSelectBox(grader1);
-    removeObjectsFromSelectBox(grader2);
-    removeObjectsFromSelectBox(grader3);
-    removeObjectsFromSelectBox(grader4);
+
 
     //Add filtered items to the source text select boxes
     var year = document.getElementById('year').value;
@@ -89,91 +90,11 @@ function filterSelectBox()
             selectBox2.options.add(createSourceTextOption(option));
         }
     }
-
-    /* Add filtered items to the grader text boxes, which will only get added if the graders are able based on 
-    their language pair */
-    for(var i = 0; i < unfilteredGraders.length; ++i)
-    {
-        var option = unfilteredGraders[i];
-        var gId = option.getAttribute('data-gId');
-        
-        //If the option (aka grader) has either the source language or target language, then add that grader as a viable option
-        if((option.getAttribute('data-language') == sourceLanguage || option.getAttribute('data-language') == targetLanguage))
-        {            
-            //If return is an object then add grader to options
-            g1Option = createGraderOption(option, grader1.options, gId);
-            if(g1Option != -1)
-            {     
-                grader1.options.add(g1Option);                
-            }  
-            g2Option = createGraderOption(option, grader2.options, gId);
-            if(g2Option != -1)
-            {     
-                grader2.options.add(g2Option);                
-            }  
-            /* As of previous database design, grader 3 and grader 4 must have a value, so give them the 
-            value of the first grader. If checking for graders, only input the graders that you need. 
-            Just because grader 3 and grader 4 exist, does not mean that they were assigned. To change 
-            database to fix this, must delete Exam, and all the other tables that Exam link to such as 
-            graders, targetText, sourceText etc.  */
-            if(grader3cb.checked){
-                g3Option = createGraderOption(option, grader3.options, gId);
-                if(g3Option != -1)
-                {     
-                  grader3.options.add(g3Option);                
-                } 
-            }
-           if(!grader3cb.checked)
-            {
-                var eOption = new Option("null", g1Option.value);
-                grader3.options.add(eOption);
-            }
-            if(grader4cb.checked){
-                g4Option = createGraderOption(option, grader4.options, gId);
-                if(g4Option != -1)
-                {     
-                  grader4.options.add(g4Option);                
-                } 
-            }
-           if(!grader4cb.checked)
-            {
-                var eOption = new Option("null", g1Option.value);
-                grader4.options.add(eOption);
-            }
-        }
-    }
  }
 
  function updateExamNumber()
  {
     document.getElementById('examNumberPDF').value = document.getElementById('examNumber').value;
- }
-
-//Zach Montgomery: edited in iteration 2 week 4
- function createGraderOption(option, graderOptions, graderId)
- {
-    var check = false;
-    //check if grader already exists in options
-    for(i=0; i<graderOptions.length; ++i)
-    {        
-        if(option.text == graderOptions[i].text){
-            check = true;              
-        }
-    }
-    var result = null;
-    
-    //If option does not exist, create new element
-    //If option exists return -1
-    if(check == false){
-        if(document.createElement('option')){
-        result = document.createElement('option');
-        result.value = graderId;
-        result.text = option.text;
-        return result;}
-    }else{
-        result = -1;
-    }
-    return result;
  }
 
  function createSourceTextOption(option)
