@@ -23,7 +23,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django import template
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render, redirect, render_to_response
 from django.contrib.auth.models import User, Group
 from texts.models import Exam, SourceText, addTargetTextToReviewQueue, removeTargetTextFromReviewQueue, TargetText, addTargetTextToInputQueue, removeTargetTextFromInputQueue
 from texts.models import addExamToGraderQueue, Discrepancy, Language, Grader
@@ -160,6 +160,10 @@ def enterNewExam(request):
 		
 def listAllQuedRecords(request):
 	return render(request, 'records/list_all_qued_records.html', {'records' : Record.objects.all()})
+
+def viewExams(request):
+    viewExams = Exam.objects.all()
+    return render(request, 'records/viewExams.html', {'viewExams' : viewExams});
 	
 
 #=========================================================================================================================

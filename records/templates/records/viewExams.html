@@ -3,9 +3,7 @@
 {% load staticfiles %}
 {% block body_block %}
 
-<br />
-
-<h3>Graded Exams</h3>
+<h3>View Exams</h3>
 
 <table align="center">
 	<thead>
@@ -24,7 +22,7 @@
 			</td>
 		</tr>
 	</thead>
-	{% for exam in gradedExams %}
+	{% for exam in viewExams %}
 		<tr>
 			<td> Exam# {{exam.examNumber}} </td>
 			<td><a href="/grade/exam/{{ exam.examNumber }}/A/">Passage A </a></td>

@@ -524,10 +524,6 @@ def generateGraph(request):
             return HttpResponse('<img src="/static/img/errorBreakdown.png" />')
 
 
-def gradedExams(request):
-  gradedExams = Exam.objects.filter(targetText1__doneGrading = True, targetText2__doneGrading = True)
-  return render_to_response('analysis/gradedExams.html', {'gradedExams' : gradedExams});
-
 
 #return the marked up html for the keywords in their original context
 def getKeywords(request, query):

@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^list-all-qued-records/$', views.listAllQuedRecords, name="listAllQuedRecords"),
 	url(r'^enter-exam/$', views.enterNewExam, name="enterNewExam"),
 	url(r'^enter-exam/upload-pdf/$', views.uploadPDF, name="uploadPDF"),
+    url(r'viewExams/$', views.viewExams, name="viewExams"),
 )
